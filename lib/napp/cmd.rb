@@ -27,18 +27,16 @@ module Napp
     def self.run(*args)                                         # {{{1
       begin
         run_cmd *args
-      rescue ArgumentError => e
+      rescue ArgumentError, OptionParser::ParseError  => e
         Util.fail! USAGE, e.message
       end
     end                                                         # }}}1
 
     # help message
-    def self.help                                               # {{{1
-      puts <<-END .gsub(/^ {8}/, '')
-        Usage     : #{ USAGE }
-        Commands  : #{ which.keys.sort.join ', ' }
-      END
-    end                                                         # }}}1
+    def self.help
+      "Usage: #{ USAGE }\n\n" +
+      "Commands: #{ which.keys.sort.join ', ' }\n"
+    end
 
     # --
 
@@ -47,7 +45,7 @@ module Napp
       if !cmd
         puts "Usage: #{USAGE}"
       elsif cmd == 'help'
-        run_help(*args)
+        run_help *args
       elsif c = which[cmd]
         c.run *args
       else
@@ -56,11 +54,11 @@ module Napp
     end                                                         # }}}1
 
     # dispatch to cmd submodule help
-    def self.run_help(cmd = nil)                                # {{{1
+    def self.run_help(cmd = nil, *args)                         # {{{1
       if !cmd
-        help
+        puts help
       elsif c = which[cmd]
-        c.help
+        puts c.help *args
       else
         raise ArgumentError, "no such subcommand: #{cmd}"
       end

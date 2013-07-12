@@ -10,6 +10,7 @@
 # --                                                            ; }}}1
 
 require 'io/console'
+require 'optparse'
 
 module Napp
 
@@ -45,6 +46,11 @@ module Napp
       x && x.empty? ? nil : x
     end
 
+    # parse options, return remaining args
+    def self.parse_opts(op, args)
+      as = args.dup; op.parse! as; as
+    end
+
     # load <dir>/* (by searching for <dir>/*.rb in $LOAD_PATH)
     # e.g. require_all('napp/types') ~> require 'napp/types/*'
     def self.require_all(dir)                                   # {{{1
@@ -52,6 +58,11 @@ module Napp
         .map { |x| "#{dir}/" + File.basename(x, '.rb') } .uniq \
         .each { |x| require x }
     end                                                         # }}}1
+
+    # hash to struct
+    def self.struct(h = {})
+      Struct.new(*h.keys).new(*h.values)
+    end
 
     # get submodules as hash
     # e.g. submodules(Foo) -> { 'bar' => Foo::Bar, ... }

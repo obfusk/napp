@@ -19,6 +19,9 @@ module Napp
 
   module VCS
 
+    DEFAULT         = 'git'
+    DEFAULT_BRANCH  = 'master'
+
     # get vcs submodule
     def self.get(vcs)
       which[vcs] or raise ArgumentError, "no such vcs: #{vcs}"
