@@ -6,5 +6,4 @@ end
 
 require 'napp'
 
-puts "napps v#{Napp::VERSION}"
 puts '... TODO ...'

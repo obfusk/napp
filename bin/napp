@@ -7,5 +7,5 @@ end
 require 'napp'
 require 'napp/cmd'
 
-puts "napp v#{Napp::VERSION}"
+puts "napp v#{Napp::VERSION}\n\n"
 Napp::Cmd.run *ARGV

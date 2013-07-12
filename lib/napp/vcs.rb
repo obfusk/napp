@@ -11,13 +11,25 @@
 
 require 'napp/util'
 
-module Napp; module VCS
+module Napp
 
-  # vcs submodules
-  def self.which
-    Util.submodules Napp::VCSs
+  module VCSs; end
+
+  Util.require_all 'napp/vcss'
+
+  module VCS
+
+    # get vcs submodule
+    def self.get(vcs)
+      which[vcs] or raise ArgumentError, "no such vcs: #{vcs}"
+    end
+
+    # vcs submodules
+    def self.which
+      Util.submodules Napp::VCSs
+    end
+
   end
-
-end; end
+end
 
 # vim: set tw=70 sw=2 sts=2 et fdm=marker :

@@ -45,6 +45,14 @@ module Napp
       x && x.empty? ? nil : x
     end
 
+    # load <dir>/* (by searching for <dir>/*.rb in $LOAD_PATH)
+    # e.g. require_all('napp/types') ~> require 'napp/types/*'
+    def self.require_all(dir)                                   # {{{1
+      $LOAD_PATH.map { |x| Dir["#{x}/#{dir}/*.rb"] } .flatten \
+        .map { |x| "#{dir}/" + File.basename(x, '.rb') } .uniq \
+        .each { |x| require x }
+    end                                                         # }}}1
+
     # get submodules as hash
     # e.g. submodules(Foo) -> { 'bar' => Foo::Bar, ... }
     def self.submodules(mod)                                    # {{{1
@@ -114,8 +122,8 @@ module Napp
 
     # prints msgs to stderr and dies with usage
     def self.fail!(usage, *msgs)
-      msgs.each { |m| STDERR.puts "error: #{m}" }
-      die! "usage: #{usage}"
+      msgs.each { |m| STDERR.puts "Error: #{m}" }
+      die! "Usage: #{usage}"
     end
 
     # --
