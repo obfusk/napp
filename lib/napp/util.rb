@@ -42,7 +42,31 @@ module Napp
       line && line.chomp
     end                                                         # }}}1
 
-    # execute command
+    # --
+
+    # exec command
+    # @raise SysError on ENOENT
+    def self.exe(cmd, *args)                                    # {{{1
+      begin
+        exec [cmd, cmd], *args
+      rescue Errno::ENOENT => e
+        raise SysError,
+          "failed to exec command #{ ([cmd] + args) }: #{e.message}"
+      end
+    end                                                         # }}}1
+
+    # spawn command
+    # @raise SysError on ENOENT
+    def self.spw(cmd, *args)                                    # {{{1
+      begin
+        spawn [cmd, cmd], *args
+      rescue Errno::ENOENT => e
+        raise SysError,
+          "failed to spawn command #{ ([cmd] + args) }: #{e.message}"
+      end
+    end                                                         # }}}1
+
+    # run command
     # @raise SysError on failure
     def self.sys(cmd, *args)
       system [cmd, cmd], *args or raise SysError,
