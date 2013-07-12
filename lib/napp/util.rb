@@ -32,7 +32,7 @@ module Napp
     # --
 
     # nil if x is .empty?, x otherwise
-    def empty_as_nil(x)
+    def self.empty_as_nil(x)
       x && x.empty? ? nil : x
     end
 
@@ -48,18 +48,18 @@ module Napp
 
     # info message; "==> <msg>" w/ colours
     def self.ohai(msg)
-      puts col(:blu), '==>', col(:whi), ' ', msg, col(:non)
+      puts col(:blu) + '==>' + col(:whi) + ' ' + msg + col(:non)
     end
 
     # error message + log; "<label>: <msg>" w/ colours
-    def self.onoe(msg, label = 'Error')
-      puts col(:red), label, col(:non), ': ', msg
-      olog "#{label}: #{msg}"
+    def self.onoe(msg, cfg, label = 'Error')
+      puts col(:red) + label + col(:non) + ': ' + msg
+      olog cfg, "#{label}: #{msg}"
     end
 
     # warning message (onoe w/ label 'Warning')
-    def self.opoo(msg)
-      onoe msg, 'Warning'
+    def self.opoo(msg, cfg)
+      onoe msg, cfg, 'Warning'
     end
 
     # onoe + exit
@@ -78,6 +78,7 @@ module Napp
           File.open(l, 'a') { |f| f.puts "#{hdr} #{m}" }
         end
       end
+      nil
     end                                                         # }}}1
 
     # --
@@ -86,6 +87,18 @@ module Napp
     def self.col(x)
       tty? ? COLOURS[x] : ''
     end
+
+    # terminal columns (cached)
+    def self.cols
+      @cols ||= %x[ TERM=${TERM:-dumb} tput cols ].to_i
+    end
+
+    # is STDOUT a tty? (cached)
+    def self.tty?
+      @tty ||= STDOUT.isatty
+    end
+
+    # --
 
     # print msg to stderr and exit
     def self.die!(msg)
@@ -112,11 +125,6 @@ module Napp
       end
       line && line.chomp
     end                                                         # }}}1
-
-    # is STDOUT a tty? (cached)
-    def self.tty?
-      @tty ||= STDOUT.isatty
-    end
 
     # --
 
