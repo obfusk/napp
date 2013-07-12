@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
 
   s.license     = 'GPLv2'
 
-# s.executables = %w{ nap }
+# s.executables = %w{ napp }
   s.files       = %w{ README.md napp.gemspec }\ # TODO
                 + Dir['lib/**/*.rb']
 
