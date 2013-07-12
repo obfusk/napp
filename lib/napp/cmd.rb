@@ -11,19 +11,32 @@
 
 require 'napp/util'
 
+module Napp; module Cmds; end; end
+
 module Napp; module Cmd
 
+  USAGE = 'napp { <command> [<arg(s)>] | help [<command>] }'
+
+  # --
+
   # run/dispatch; ArgumentError -> die!
-  def self.run(cmd, *args)                                      # {{{1
+  def self.run(*args)                                           # {{{1
     begin
-      run_cmd cmd, *args
+      run_cmd *args
     rescue ArgumentError => e
-      Util.die! "Error: #{e.message}"
+      Util.fail! USAGE, e.message
     end
   end                                                           # }}}1
 
+  # help message
+  def self.help                                                 # TODO
+    puts 'TODO: help message'
+  end
+
+  # --
+
   # dispatch to cmd submodule run
-  def self.run_cmd(cmd, *args)                                  # {{{1
+  def self.run_cmd(cmd = nil, *args)                            # {{{1
     if !cmd
       raise ArgumentError, 'subcommand expected'
     elsif cmd == 'help'
@@ -36,9 +49,9 @@ module Napp; module Cmd
   end                                                           # }}}1
 
   # dispatch to cmd submodule help
-  def run_help(cmd)                                             # {{{1
+  def self.run_help(cmd = nil)                                  # {{{1
     if !cmd
-      raise ArgumentError, 'subcommand expected'
+      help
     elsif c = which[cmd]
       c.help
     else

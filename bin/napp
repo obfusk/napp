@@ -5,6 +5,7 @@ unless Gem.loaded_specs.include? 'napp'
 end
 
 require 'napp'
+require 'napp/cmd'
 
 puts "napp v#{Napp::VERSION}"
-puts '... TODO ...'
+Napp::Cmd.run *ARGV

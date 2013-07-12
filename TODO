@@ -1,0 +1,2 @@
+$:.map { |x| Dir[x + '/napp/cmds/*.rb'] }.flatten.map { |x|
+ 'napp/cmds/' + File.basename(x, '.rb') }.each { |x| require x }

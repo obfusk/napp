@@ -112,6 +112,14 @@ module Napp
       STDERR.puts msg; exit 1
     end
 
+    # prints msgs to stderr and dies with usage
+    def self.fail!(usage, *msgs)
+      msgs.each { |m| STDERR.puts "error: #{m}" }
+      die! "usage: #{usage}"
+    end
+
+    # --
+
     # does file/dir or symlink exists?
     def self.exists?(path)
       File.exists?(path) || File.symlink?(path)
