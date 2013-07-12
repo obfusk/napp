@@ -17,6 +17,11 @@ module Napp
 
   module Util
 
+    class SysError < Error; end
+
+    # --
+
+    # some ansi escape colours
     COLOURS = {                                                 # {{{1
       non:  "\e[0m",
       red:  "\e[1;31m",
@@ -25,9 +30,13 @@ module Napp
       whi:  "\e[1;37m",
     }                                                           # }}}1
 
-    # --
-
-    class SysError < Error; end
+    # some simple validations; false positives; no funny chars
+    VALIDATE = {                                                # {{{1
+      num:  %r{[0-9]+},
+      word: %r{[a-z0-9_-]+},
+      host: %r{[a-z0-9.*-]+|_},
+      url:  %r{[a-z0-9A-Z@.:/_-]+},
+    }                                                           # }}}1
 
     # --
 
@@ -66,8 +75,6 @@ module Napp
     def self.odie(*args)
       onoe *args; exit 1
     end
-
-    # --
 
     # write message(s) to log file(s)
     def self.olog(cfg, *msgs)                                   # {{{1
@@ -108,6 +115,11 @@ module Napp
     # does file/dir or symlink exists?
     def self.exists?(path)
       File.exists?(path) || File.symlink?(path)
+    end
+
+    # write pid to file
+    def self.mkpid(file, pid)
+      File.open(file, 'w') { |f| f.puts pid }
     end
 
     # current time ('%F %T')
