@@ -17,8 +17,8 @@ Gem::Specification.new do |s|
 
   s.license     = 'GPLv2'
 
-# s.executables = %w{ napp }
-  s.files       = %w{ README.md napp.gemspec }\ # TODO
+  s.executables = %w{ napp napps }
+  s.files       = %w{ README.md napp.gemspec }\
                 + Dir['lib/**/*.rb']
 
   s.required_ruby_version = '>= 1.9.1'
