@@ -13,6 +13,7 @@
 
   * ...
   * obfuskd/napp
+  * errors to STDERR?
 
 ## Description
 []: {{{1

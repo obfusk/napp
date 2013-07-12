@@ -17,9 +17,75 @@ module Napp
 
   module Util
 
+    COLOURS = {                                                 # {{{1
+      non:  "\e[0m",
+      red:  "\e[1;31m",
+      grn:  "\e[1;32m",
+      blu:  "\e[1;34m",
+      whi:  "\e[1;37m",
+    }                                                           # }}}1
+
+    # --
+
     class SysError < Error; end
 
     # --
+
+    # nil if x is .empty?, x otherwise
+    def empty_as_nil(x)
+      x && x.empty? ? nil : x
+    end
+
+    # get submodules as hash
+    # e.g. submodules(Foo) -> { 'bar' => Foo::Bar, ... }
+    def self.submodules(mod)                                    # {{{1
+      Hash[ mod.constants \
+            .map { |x| [x.downcase.to_s, mod.const_get(x)] } \
+            .select { |k,v| v.class == Module } ]
+    end                                                         # }}}1
+
+    # --
+
+    # info message; "==> <msg>" w/ colours
+    def self.ohai(msg)
+      puts col(:blu), '==>', col(:whi), ' ', msg, col(:non)
+    end
+
+    # error message + log; "<label>: <msg>" w/ colours
+    def self.onoe(msg, label = 'Error')
+      puts col(:red), label, col(:non), ': ', msg
+      olog "#{label}: #{msg}"
+    end
+
+    # warning message (onoe w/ label 'Warning')
+    def self.opoo(msg)
+      onoe msg, 'Warning'
+    end
+
+    # onoe + exit
+    def self.odie(*args)
+      onoe *args; exit 1
+    end
+
+    # --
+
+    # write message(s) to log file(s)
+    def self.olog(cfg, *msgs)                                   # {{{1
+      name  = cfg[:name]
+      hdr   = "[#{now}][nap#{ name ? " (#{name})" : '' }]"
+      msgs.each do |m|
+        cfg[:logfiles].each do |l|
+          File.open(l, 'a') { |f| f.puts "#{hdr} #{m}" }
+        end
+      end
+    end                                                         # }}}1
+
+    # --
+
+    # colour code (or '' if not tty)
+    def self.col(x)
+      tty? ? COLOURS[x] : ''
+    end
 
     # print msg to stderr and exit
     def self.die!(msg)
@@ -29,6 +95,11 @@ module Napp
     # does file/dir or symlink exists?
     def self.exists?(path)
       File.exists?(path) || File.symlink?(path)
+    end
+
+    # current time ('%F %T')
+    def self.now(fmt = '%F %T')
+      Time.now.strftime fmt
     end
 
     # prompt for line; optionally hide input
@@ -41,6 +112,11 @@ module Napp
       end
       line && line.chomp
     end                                                         # }}}1
+
+    # is STDOUT a tty? (cached)
+    def self.tty?
+      @tty ||= STDOUT.isatty
+    end
 
     # --
 
@@ -72,23 +148,6 @@ module Napp
       system [cmd, cmd], *args or raise SysError,
         "failed to run command #{ ([cmd] + args) } (#$?)"
     end
-
-    # --
-
-    # nil if x is .empty?, x otherwise
-    def empty_as_nil(x)
-      x && x.empty? ? nil : x
-    end
-
-    # --
-
-    # get submodules as hash
-    # e.g. submodules(Foo) -> { 'bar' => Foo::Bar, ... }
-    def self.submodules(mod)                                    # {{{1
-      Hash[ mod.constants \
-            .map { |x| [x.downcase.to_s, mod.const_get(x)] } \
-            .select { |k,v| v.class == Module } ]
-    end                                                         # }}}1
 
   end
 end
