@@ -9,40 +9,64 @@
 #
 # --                                                            ; }}}1
 
-module Napp; module Util
+require 'io/console'
 
-  # ...
+module Napp
 
-  # --
+  class Error < RuntimeError; end
 
-  def self.type_module (x)
-    types[_submodule_name(x)]
+  module Util
+
+    class SysError < Error; end
+
+    # --
+
+    # print msg to stderr and exit
+    def self.die!(msg)
+      STDERR.puts msg; exit 1
+    end
+
+    # does file/dir or symlink exists?
+    def self.exists?(path)
+      File.exists?(path) || File.symlink?(path)
+    end
+
+    # prompt for line; optionally hide input
+    def self.prompt(prompt, hide = false)                       # {{{1
+      STDOUT.print prompt; STDOUT.flush
+      line = if hide
+        l = STDIN.noecho { |i| i.gets }; STDOUT.puts; l
+      else
+        STDIN.gets
+      end
+      line && line.chomp
+    end                                                         # }}}1
+
+    # execute command
+    # @raise SysError on failure
+    def self.sys(cmd, *args)
+      system [cmd, cmd], *args or raise SysError,
+        "failed to run command #{ ([cmd] + args) } (#$?)"
+    end
+
+    # --
+
+    # nil if x is .empty?, x otherwise
+    def empty_as_nil(x)
+      x && x.empty? ? nil : x
+    end
+
+    # --
+
+    # get submodules as hash
+    # e.g. submodules(Foo) -> { 'bar' => Foo::Bar, ... }
+    def self.submodules(mod)                                    # {{{1
+      Hash[ mod.constants \
+            .map { |x| [x.downcase.to_s, mod.const_get(x)] } \
+            .select { |k,v| v.class == Module } ]
+    end                                                         # }}}1
+
   end
-
-  def self.vcs_module (x)
-    vcss[_submodule_name(x)]
-  end
-
-  def self.types
-    _submodules Napp::Types
-  end
-
-  def self.vcss
-    _submodules Napp::Vcss
-  end
-
-  # --
-
-  def self._submodule_name(x)
-    x.capitalize.to_sym
-  end
-
-  def self._submodules(mod)
-    Hash[ mod.constants \
-          .map { |x| [x,mod.const_get(x)] } \
-          .select { |k,v| v.class == Module } ]
-  end
-
-end; end
+end
 
 # vim: set tw=70 sw=2 sts=2 et fdm=marker :
