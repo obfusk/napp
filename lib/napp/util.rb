@@ -35,14 +35,6 @@ module Napp
       whi:  "\e[1;37m",
     }                                                           # }}}1
 
-    # some simple validations; false positives; no funny chars
-    VALIDATE = {                                                # {{{1
-      num:  %r{[0-9]+},
-      word: %r{[a-z0-9_-]+},
-      host: %r{[a-z0-9.*-]+|_},
-      url:  %r{[a-z0-9A-Z@.:/_-]+},
-    }                                                           # }}}1
-
     # --
 
     # validate #args in min..max (min.. if max=nil); returns args

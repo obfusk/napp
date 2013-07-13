@@ -11,6 +11,7 @@
 
 require 'napp/type'
 require 'napp/util'
+require 'napp/valid'
 require 'napp/vcs'
 
 require 'yaml'
@@ -23,12 +24,12 @@ module Napp; module Cfg
 
   All     = Util.struct *%w{ nappcfg global cmd name app type extra }
   Global  = Util.struct *%w{ dirs user user_prefix users log_w_sudo
-                             commands }
+                             commands defaults }
   Name    = Util.struct *%w{ user app }
-  Dirs    = Util.struct *%w{ apps log app }
-  AppDirs = Util.struct *%w{ app cfg log run }
   App     = Util.struct *%w{ type repo vcs branch }
   Extra   = Util.struct *%w{ type type_mod vcs_mod }
+  Dirs    = Util.struct *%w{ apps log app }
+  AppDirs = Util.struct *%w{ app cfg log run }
 
   # --
 
@@ -40,13 +41,12 @@ module Napp; module Cfg
 
   # --
 
-  # app name (where foo is expaneded to <user>/foo) -> Name
+  # app name (where foo is expanded to <user>/foo) -> Name
   # @raise ValidationError if not word or word1/word2
   def self.app_name(name)                                       # {{{1
-    w = Util::VALIDATE[:word]
-    x = if name.match %r{^(#{w})$}
+    x = if name.match %r{^(#{Valid::WORD})$}
       { user: Util.user, app: name }
-    elsif name.match %r{^(#{w})/(#{w})$}
+    elsif name.match %r{^(#{Valid::WORD})/(#{Valid::WORD})$}
       { user: $1, app: $2 }
     else
       raise Util::ValidationError, "invalide name"
@@ -100,7 +100,7 @@ module Napp; module Cfg
   # load Global from YAML string
   def self.load_global(str)                                     # {{{1
     d     = YAML.load str
-    napp  = Hash[ (Global.members - [:dirs, :commands])
+    napp  = Hash[ (Global.members - [:dirs, :commands, :defaults])
                   .map { |x| [x, d['napp'][x.to_s]] } ]
     dirs  = Hash[ (Dirs.members - [:app])
                   .map { |x| [x, d['napp']['dirs'][x.to_s]] } ]
@@ -109,10 +109,11 @@ module Napp; module Cfg
     dirs[:app]      = AppDirs.new app
     napp[:dirs]     = Dirs.new dirs
     napp[:commands] = d['commands']
+    napp[:defaults] = d['defaults']
     Global.new napp
   end                                                           # }}}1
 
-  # load Global from <dir>/napp.yml
+  # load Global from napp.yml
   def self.read_global(cfg)
     load_global File.read file_napp_yml cfg
   end

@@ -12,6 +12,7 @@
 require 'napp/cfg'
 require 'napp/type'
 require 'napp/util'
+require 'napp/valid'
 require 'napp/vcs'
 
 module Napp; module Cmds; module New
@@ -21,15 +22,17 @@ module Napp; module Cmds; module New
 
   CmdCfg  = Util.struct *%w{ help }
 
-  # parse opts, validate
+  # --
+
+  # parse opts, validate; MODIFIES cfg
   def self.prepare(cfg, name_, type, repo, args)                # {{{1
+    Valid.type! type; Valid.repo! repo
     name  = Cfg.app_name name_
-    Util.validate! type, Util::VALIDATE[:word], 'type'
-    Util.validate! repo, Util::VALIDATE[:url] , 'repo'
     t     = Type.get type
     cmd   = CmdCfg.new help: false
     app   = Cfg::App.new type: type, repo: repo,
-                  vcs: VCS::DEFAULT, branch: VCS::DEFAULT_BRANCH
+              vcs: cfg.global.defaults['vcs'],
+              branch: cfg.global.defaults['branch']
     extra = Cfg::Extra.new type: type, type_mod: t
     cfg.cmd = cmd; cfg.name = name; cfg.app = app; cfg.extra = extra
     op    = opt_parser cfg
@@ -45,13 +48,13 @@ module Napp; module Cmds; module New
     name, type, repo, *args = Util.args 'new', args_, 3, nil
     prepare cfg, name, type, repo, args
 
-    require 'pry'; binding.pry
+    require 'pry'; binding.pry                                  # TODO
   end                                                           # }}}1
 
-  # help message
+  # help message; MODIFIES cfg
   def self.help(cfg, *args_)                                    # {{{1
     type,     = Util.args 'help new', args_, 0, 1
-    Util.validate! type, Util::VALIDATE[:word], 'type' if type
+    Valid.type! type if type
     t         = type && Type.get(type)
     cfg.cmd   = CmdCfg.new help: true
     cfg.extra = Cfg::Extra.new type: type, type_mod: t
@@ -61,17 +64,19 @@ module Napp; module Cmds; module New
     "VCSs: #{ VCS.which.keys.sort.join ', ' }\n"
   end                                                           # }}}1
 
-  # option parser; extended by cfg.extra.type_mod.options
+  # option parser; extended by cfg.extra.type_mod.options;
+  # MODIFIES cfg
   def self.opt_parser(cfg)                                      # {{{1
     # TODO: napp modify --name= --repo= !?
     OptionParser.new 'Options:' do |o|
       o.on('--vcs VCS',
            'Version control system; ' +
-           "default is #{VCS::DEFAULT}") do |x|
+           "default is #{cfg.global.defaults['vcs']}") do |x|
         cfg.app.vcs = x
       end
       o.on('--branch BRANCH',
-           "VCS branch; default is #{VCS::DEFAULT_BRANCH}") do |x|
+           'VCS branch; default is ' +
+           "#{cfg.global.defaults['branch']}") do |x|
         cfg.app.branch = x
       end
       if t = cfg.extra.type_mod

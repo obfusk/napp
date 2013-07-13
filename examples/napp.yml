@@ -37,3 +37,7 @@ commands:
   RACKUP:       bundle exec rackup -p ${PORT}
   RAILS_BOOT:   napp-helper-bootstrap-rails
   RAILS_UPD:    napp-helper-update-rails
+
+defaults:
+  vcs: git
+  branch: master

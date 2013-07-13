@@ -14,9 +14,10 @@ require 'napp/util'
 module Napp; module Log
 
   # write message(s) to log file(s)
+  # TODO: napp-log
   def self.olog(cfg, *msgs)                                     # {{{1
     name  = cfg.app.name
-    hdr   = "[#{Util.now}][nap#{ name ? " (#{name})" : '' }]"
+    hdr   = "[#{Util.now}][napp#{ name ? " (#{name})" : '' }]"
     msgs.each do |m|
       cfg.global.logfiles.each do |l|
         File.open(l, 'a') { |f| f.puts "#{hdr} #{m}" }

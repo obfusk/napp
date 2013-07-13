@@ -23,7 +23,7 @@ module Napp
 
     # --
 
-    # run/dispatch; ArgumentError -> die!
+    # run/dispatch; *Error -> die!
     def self.run(cfg, *args)                                    # {{{1
       begin
         run_cmd cfg, *args
@@ -42,6 +42,7 @@ module Napp
     # --
 
     # dispatch to cmd submodule run
+    # @raise ArgError on unknown command
     def self.run_cmd(cfg, cmd = nil, *args)                     # {{{1
       if !cmd
         puts "Usage: #{USAGE}"
@@ -55,6 +56,7 @@ module Napp
     end                                                         # }}}1
 
     # dispatch to cmd submodule help
+    # @raise ArgError on unknown command
     def self.run_help(cfg, cmd = nil, *args)                    # {{{1
       if !cmd
         puts help cfg

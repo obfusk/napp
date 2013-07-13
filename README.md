@@ -12,7 +12,7 @@
 ## TODO
 
   * ...
-  * validate cfg, input
+  * validate cfg, input + defaults
   * obfuskd/napp
   * errors to STDERR?
 

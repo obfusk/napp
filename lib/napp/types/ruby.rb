@@ -20,9 +20,14 @@ module Napp; module Types; module Ruby
     update: nil, logdir: nil, public: nil, server: nil
   }
 
+  DEFAULT_LOG = 'log'
+  DEFAULT_PUB = 'pub'
+
   TypeCfg = Util.struct *DEFAULTS.keys
 
-  # extends Cmd::New option parser
+  # --
+
+  # extends Cmd::New option parser; MODIFIES cfg
   def self.options(o, cfg)                                      # {{{1
     cfg.type = TypeCfg.new DEFAULTS unless cfg.cmd.help
     o.on('--socket', 'Listen on socket') do |x|
@@ -45,13 +50,13 @@ module Napp; module Types; module Ruby
     end
     o.on('--logdir [DIR]',
          'Subdir of app with *.log files; optional;',
-         'default with no argument is log') do |x|
-      cfg.type.logdir = x || 'log'
+         "default with no argument is #{DEFAULT_LOG}") do |x|
+      cfg.type.logdir = x || DEFAULT_LOG
     end
     o.on('--public [DIR]',
          'Subdir of app with public files; optional;',
-         'default with no argument is public') do |x|
-      cfg.type.public = x || 'public'
+         "default with no argument is #{DEFAULT_PUB}") do |x|
+      cfg.type.public = x || DEFAULT_PUB
     end
     o.on('--server NAME', 'Nginx server_name; optional') do |x|
       cfg.type.server = x
