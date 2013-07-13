@@ -2,7 +2,7 @@
 #
 # File        : napp/util.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-12
+# Date        : 2013-07-13
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -18,7 +18,9 @@ module Napp
 
   module Util
 
+    class ArgError < Error; end
     class SysError < Error; end
+    class ValidationError < Error; end
 
     # --
 
@@ -40,6 +42,16 @@ module Napp
     }                                                           # }}}1
 
     # --
+
+    # validate #args in min..max (min.. if max=nil); returns args
+    # @raise ArgError on out of bounds
+    def self.args(what, args, min, max = min)                   # {{{1
+      if args.length < min || (max && args.length > max)
+        raise ArgError, "#{what} expected #{min}..#{max} arguments" +
+                        ", got #{args.length}"
+      end
+      args
+    end                                                         # }}}1
 
     # nil if x is .empty?, x otherwise
     def self.empty_as_nil(x)
@@ -66,6 +78,12 @@ module Napp
             .map { |x| [x.downcase.to_s, mod.const_get(x)] } \
             .select { |k,v| v.class == Module } ]
     end                                                         # }}}1
+
+    # validate value against regex
+    # @raise ValidationError on no match
+    def self.validate!(x, rx, name)
+      x.match /^(#{rx})$/ or raise ValidationError, "invalid #{name}"
+    end
 
     # --
 
@@ -96,7 +114,7 @@ module Napp
     # error message + log; "<label>: <msg>" w/ colours
     def self.onoe(msg, cfg, label = 'Error')
       puts col(:red) + label + col(:non) + ': ' + msg
-      olog cfg, "#{label}: #{msg}"
+      Log.olog cfg, "#{label}: #{msg}"
     end
 
     # warning message (onoe w/ label 'Warning')
@@ -108,18 +126,6 @@ module Napp
     def self.odie(*args)
       onoe *args; exit 1
     end
-
-    # write message(s) to log file(s)
-    def self.olog(cfg, *msgs)                                   # {{{1
-      name  = cfg[:name]
-      hdr   = "[#{now}][nap#{ name ? " (#{name})" : '' }]"
-      msgs.each do |m|
-        cfg[:logfiles].each do |l|
-          File.open(l, 'a') { |f| f.puts "#{hdr} #{m}" }
-        end
-      end
-      nil
-    end                                                         # }}}1
 
     # --
 

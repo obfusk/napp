@@ -2,7 +2,7 @@
 #
 # File        : napp/cmds/new.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-12
+# Date        : 2013-07-13
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -16,59 +16,70 @@ require 'napp/vcs'
 
 module Napp; module Cmds; module New
 
-  USAGE = 'napp new <name> <type> <repo> [<opt(s)>]'
-  HELP  = 'napp help new [<type>]'
+  USAGE   = 'napp new <name> <type> <repo> [<opt(s)>]'
+  HELP    = 'napp help new [<type>]'
 
-  Cfg   = Util.struct *%w{ info app type }
-  Info  = Util.struct *%w{ help type t_name vcs }
+  CmdCfg  = Util.struct *%w{ help }
 
   # parse opts, validate
-  def self.prepare(name, type, repo, args)                      # {{{1
+  def self.prepare(cfg, name, type, repo, args)                 # {{{1
+    Util.validate! name, Util::VALIDATE[:word], 'name'          # TODO
+    Util.validate! type, Util::VALIDATE[:word], 'type'
+    Util.validate! repo, Util::VALIDATE[:url] , 'repo'
     t     = Type.get type
-    info  = Info.new help: false, type: t, t_name: type, vcs: nil
-    app   = Napp::Cfg::App.new name: name, type: type, repo: repo,
-              vcs: VCS::DEFAULT, branch: VCS::DEFAULT_BRANCH
-    opts  = Cfg.new info: info, app: app, type: nil
-    op    = opt_parser opts
+    cmd   = CmdCfg.new help: false
+    app   = Cfg::App.new name: name, type: type, repo: repo,
+                  vcs: VCS::DEFAULT, branch: VCS::DEFAULT_BRANCH
+    extra = Cfg::Extra.new type: type, type_mod: t
+    cfg.cmd = cmd; cfg.app = app; cfg.extra = extra
+    op    = opt_parser cfg
     as    = Util.parse_opts op, args
-    as.empty? or raise ArgumentError, 'too many arguments'
-    opts.info.vcs = VCS.get opts.app.vcs
-    t.validate! opts
-    opts
+    as.empty? or raise Util::ArgError, 'too many arguments'
+    cfg.extra.vcs_mod = VCS.get cfg.app.vcs
+    t.validate! cfg
+    nil
   end                                                           # }}}1
 
   # ... TODO ...
-  def self.run(name, type, repo, *args)                         # {{{1
-    opts = prepare name, type, repo, args
+  def self.run(cfg, *args_)                                     # {{{1
+    name, type, repo, *args = Util.args 'new', args_, 3, nil
+    prepare cfg, name, type, repo, args
+
+    # TODO {
     require 'yaml'
-    puts Util.a_struct(app: opts.app, type: opts.type).to_yaml
+    puts Util.a_struct(app: cfg.app, type: cfg.type).to_yaml
+    # } TODO
   end                                                           # }}}1
 
   # help message
-  def self.help(type = nil)                                     # {{{1
-    t = type && Type.get(type)
-    o = Cfg.new info: Info.new(help: true, type: t, t_name: type)
+  def self.help(cfg, *args_)                                    # {{{1
+    type,     = Util.args 'help new', args_, 0, 1
+    Util.validate! type, Util::VALIDATE[:word], 'type' if type
+    t         = type && Type.get(type)
+    cfg.cmd   = CmdCfg.new help: true
+    cfg.extra = Cfg::Extra.new type: type, type_mod: t
     "Usage: #{ USAGE }\n\n" +
-    opt_parser(o).help + "\n" +
+    opt_parser(cfg).help + "\n" +
     "Types: #{ Type.which.keys.sort.join ', ' }\n" +
     "VCSs: #{ VCS.which.keys.sort.join ', ' }\n"
   end                                                           # }}}1
 
-  # option parser; extended by type.options
-  def self.opt_parser(opts)                                     # {{{1
+  # option parser; extended by cfg.extra.type_mod.options
+  def self.opt_parser(cfg)                                      # {{{1
+    # TODO: napp modify --name= --repo= !?
     OptionParser.new 'Options:' do |o|
       o.on('--vcs VCS',
            'Version control system; ' +
            "default is #{VCS::DEFAULT}") do |x|
-        opts.app.vcs = x
+        cfg.app.vcs = x
       end
       o.on('--branch BRANCH',
            "VCS branch; default is #{VCS::DEFAULT_BRANCH}") do |x|
-        opts.app.branch = x
+        cfg.app.branch = x
       end
-      if t = opts.info.type
-        o.separator "\n#{opts.info.t_name} options:"
-        t.options o, opts
+      if t = cfg.extra.type_mod
+        o.separator "\n#{cfg.extra.type} options:"
+        t.options o, cfg
       else
         o.separator "\nTo see type options, use: #{HELP}"
       end

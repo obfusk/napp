@@ -2,7 +2,7 @@
 #
 # File        : napp/types/ruby.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-12
+# Date        : 2013-07-13
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -20,63 +20,63 @@ module Napp; module Types; module Ruby
     logdir: nil, public: nil, server: nil
   }
 
-  Cfg = Util.struct *DEFAULTS.keys
+  TypeCfg = Util.struct *DEFAULTS.keys
 
   # extends Cmd::New option parser
-  def self.options(o, opts)                                     # {{{1
-    opts.type = Cfg.new DEFAULTS unless opts.info.help
+  def self.options(o, cfg)                                      # {{{1
+    cfg.type = TypeCfg.new DEFAULTS unless cfg.cmd.help
     o.on('--socket', 'Listen on socket') do |x|
-      opts.type.listen = :socket
+      cfg.type.listen = :socket
     end
     o.on('--port PORT', 'Listen on port') do |x|
-      opts.type.listen = :port
-      opts.type.port = x
+      cfg.type.listen = :port
+      cfg.type.port = x
     end
     o.on('--run CMD', 'Command to run app') do |x|
-      opts.type.run = x
+      cfg.type.run = x
     end
     o.on('--bootstrap CMD',
          'Command to bootstrap app;',
          'default is update command') do |x|
-      opts.type.bootstrap = x
+      cfg.type.bootstrap = x
     end
     o.on('--update CMD', 'Command to update app') do |x|
-      opts.type.update = x
+      cfg.type.update = x
     end
     o.on('--logdir DIR',
          'Subdir of app with *.log files; optional') do |x|
-      opts.type.logdir = x
+      cfg.type.logdir = x
     end
     o.on('--public DIR',
          'Subdir of app with public files; optional') do |x|
-      opts.type.public = x
+      cfg.type.public = x
     end
     o.on('--server NAME', 'Nginx server_name; optional') do |x|
-      opts.type.server = x
+      cfg.type.server = x
     end
   end                                                           # }}}1
 
-  def self.validate!(opts)
+  def self.validate!(cfg)
   end
 
   # --
 
-  def self.bootstrap(opts)
+  def self.bootstrap(cfg)
   end
 
-  def self.status(opts)
+  def self.running?(cfg)
   end
 
-  def self.running?(opts)
+  def self.status(cfg)
   end
 
-  def self.start(opts)
+  def self.start(cfg)
   end
 
-  def self.stop(opts)
+  def self.stop(cfg)
   end
 
-  def self.restart(opts)
+  def self.restart(cfg)
   end
 
 end; end; end

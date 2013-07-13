@@ -4,8 +4,10 @@ unless Gem.loaded_specs.include? 'napp'
   $:.unshift File.expand_path('../../lib', __FILE__)
 end
 
-require 'napp'
+require 'napp/cfg'
 require 'napp/cmd'
+require 'napp/version'
 
 puts "napp v#{Napp::VERSION}\n\n"
-Napp::Cmd.run *ARGV
+cfg = Napp::Cfg::All.new global: Napp::Cfg.load_global
+Napp::Cmd.run cfg, *ARGV

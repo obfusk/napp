@@ -2,7 +2,7 @@
 #
 # File        : napp/vcs.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-12
+# Date        : 2013-07-13
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -24,7 +24,7 @@ module Napp
 
     # get vcs submodule
     def self.get(vcs)
-      which[vcs] or raise ArgumentError, "no such vcs: #{vcs}"
+      which[vcs] or raise Util::ArgError, "no such vcs: #{vcs}"
     end
 
     # vcs submodules

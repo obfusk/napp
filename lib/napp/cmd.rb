@@ -2,7 +2,7 @@
 #
 # File        : napp/cmd.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-12
+# Date        : 2013-07-13
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -24,16 +24,17 @@ module Napp
     # --
 
     # run/dispatch; ArgumentError -> die!
-    def self.run(*args)                                         # {{{1
+    def self.run(cfg, *args)                                    # {{{1
       begin
-        run_cmd *args
-      rescue ArgumentError, OptionParser::ParseError  => e
+        run_cmd cfg, *args
+      rescue Util::ArgError, Util::ValidationError,
+             OptionParser::ParseError => e
         Util.fail! USAGE, e.message
       end
     end                                                         # }}}1
 
     # help message
-    def self.help
+    def self.help(cfg)
       "Usage: #{ USAGE }\n\n" +
       "Commands: #{ which.keys.sort.join ', ' }\n"
     end
@@ -41,26 +42,26 @@ module Napp
     # --
 
     # dispatch to cmd submodule run
-    def self.run_cmd(cmd = nil, *args)                          # {{{1
+    def self.run_cmd(cfg, cmd = nil, *args)                     # {{{1
       if !cmd
         puts "Usage: #{USAGE}"
       elsif cmd == 'help'
-        run_help *args
+        run_help cfg, *args
       elsif c = which[cmd]
-        c.run *args
+        c.run cfg, *args
       else
-        raise ArgumentError, "no such subcommand: #{cmd}"
+        raise Util::ArgError, "no such subcommand: #{cmd}"
       end
     end                                                         # }}}1
 
     # dispatch to cmd submodule help
-    def self.run_help(cmd = nil, *args)                         # {{{1
+    def self.run_help(cfg, cmd = nil, *args)                    # {{{1
       if !cmd
-        puts help
+        puts help cfg
       elsif c = which[cmd]
-        puts c.help *args
+        puts c.help cfg, *args
       else
-        raise ArgumentError, "no such subcommand: #{cmd}"
+        raise Util::ArgError, "no such subcommand: #{cmd}"
       end
     end                                                         # }}}1
 

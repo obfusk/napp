@@ -2,7 +2,7 @@
 #
 # File        : napp/type.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-12
+# Date        : 2013-07-13
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -21,7 +21,7 @@ module Napp
 
     # get type submodule
     def self.get(type)
-      which[type] or raise ArgumentError, "no such type: #{type}"
+      which[type] or raise Util::ArgError, "no such type: #{type}"
     end
 
     # type submodules
