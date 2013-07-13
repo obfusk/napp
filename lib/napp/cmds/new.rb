@@ -10,6 +10,7 @@
 # --                                                            ; }}}1
 
 require 'napp/cfg'
+require 'napp/log'
 require 'napp/type'
 require 'napp/util'
 require 'napp/valid'
@@ -41,15 +42,18 @@ module Napp; module Cmds; module New
     Valid.vcs! cfg.app.vcs; Valid.branch! cfg.app.branch
     cfg.extra.vcs_mod = VCS.get cfg.app.vcs
     t.validate! cfg
-    nil
   end                                                           # }}}1
 
-  # ... TODO ...
+  # create new app: clone + cfg
   def self.run(cfg, *args_)                                     # {{{1
     name, type, repo, *args = Util.args 'new', args_, 3, nil
     prepare cfg, name, type, repo, args
 
-    require 'pry'; binding.pry                                  # TODO
+    Log.olog cfg, "creating ..."
+    Util.odie cfg, "app #{cfg.name.join} already exists" \
+      if Util.exists? Cfg.dir_app(cfg)
+
+    # ...
   end                                                           # }}}1
 
   # help message; MODIFIES cfg

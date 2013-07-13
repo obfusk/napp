@@ -24,12 +24,19 @@ module Napp; module Cfg
 
   All     = Util.struct *%w{ nappcfg global cmd name app type extra }
   Global  = Util.struct *%w{ dirs user user_prefix users log_w_sudo
-                             commands defaults }
-  Name    = Util.struct *%w{ user app }
+                             commands defaults logfiles }
   App     = Util.struct *%w{ type repo vcs branch }
   Extra   = Util.struct *%w{ type type_mod vcs_mod }
   Dirs    = Util.struct *%w{ apps log app }
   AppDirs = Util.struct *%w{ app cfg log run }
+
+  # --
+
+  Name = Util.struct *%w{ user app } do
+    def join
+      "#{user}/#{app}"
+    end
+  end
 
   # --
 
@@ -110,6 +117,7 @@ module Napp; module Cfg
     napp[:dirs]     = Dirs.new dirs
     napp[:commands] = d['commands']
     napp[:defaults] = d['defaults']
+    napp[:logfiles] = []
     Global.new napp
   end                                                           # }}}1
 

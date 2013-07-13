@@ -9,9 +9,31 @@
 #
 # --                                                            ; }}}1
 
+require 'napp/util'
+
 module Napp; module VCSs; module Git
 
-  # ...
+  CLONE = ->(r,d,b) { %w{ git clone -b } + [b,r,d] }
+  PULL  = ->(b)     { %w{ git pull origin } + [b] }
+  LOG   = ->(n,v)   { %w{ git log --reverse } + ["-#{n}"] +
+                        (v ? [] : %w{ --oneline }) }
+
+  # --
+
+  # clone repo to dir (and checkout branch)
+  def self.clone(repo, dir, branch)
+    Util.run CLONE[repo, dir, branch]
+  end
+
+  # pull branch in dir
+  def self.pull(dir, branch)
+    Dir.chdir(dir) { Util.run PULL[branch] }
+  end
+
+  # show log in dir, n lines, optionally verbose, newest last
+  def self.log(dir, n, verbose)
+    Dir.chdir(dir) { Util.run LOG[n,verbose] }
+  end
 
 end; end; end
 

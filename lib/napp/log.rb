@@ -16,12 +16,12 @@ module Napp; module Log
   # write message(s) to log file(s)
   # TODO: napp-log
   def self.olog(cfg, *msgs)                                     # {{{1
-    name  = cfg.app.name
-    hdr   = "[#{Util.now}][napp#{ name ? " (#{name})" : '' }]"
+    hdr = "[#{Util.now}][napp (#{cfg.name.join})]"
     msgs.each do |m|
       cfg.global.logfiles.each do |l|
         File.open(l, 'a') { |f| f.puts "#{hdr} #{m}" }
       end
+      puts "-- [DEBUG] #{hdr} #{m}"                             # TODO
     end
     nil
   end                                                           # }}}1
