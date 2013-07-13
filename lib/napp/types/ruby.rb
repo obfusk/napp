@@ -43,13 +43,15 @@ module Napp; module Types; module Ruby
     o.on('--update CMD', 'Command to update app') do |x|
       cfg.type.update = x
     end
-    o.on('--logdir DIR',
-         'Subdir of app with *.log files; optional') do |x|
-      cfg.type.logdir = x
+    o.on('--logdir [DIR]',
+         'Subdir of app with *.log files; optional;',
+         'default with no argument is log') do |x|
+      cfg.type.logdir = x || 'log'
     end
-    o.on('--public DIR',
-         'Subdir of app with public files; optional') do |x|
-      cfg.type.public = x
+    o.on('--public [DIR]',
+         'Subdir of app with public files; optional;',
+         'default with no argument is public') do |x|
+      cfg.type.public = x || 'public'
     end
     o.on('--server NAME', 'Nginx server_name; optional') do |x|
       cfg.type.server = x
