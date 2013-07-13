@@ -49,7 +49,7 @@ module Napp; module Cfg
     elsif name.match %r{^(#{Valid::WORD})/(#{Valid::WORD})$}
       { user: $1, app: $2 }
     else
-      raise Util::ValidationError, "invalide name"
+      Util.invalid! 'invalid name'
     end
     Name.new x
   end                                                           # }}}1

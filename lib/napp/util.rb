@@ -52,6 +52,11 @@ module Napp
       x && x.empty? ? nil : x
     end
 
+    # @raise ValidationError
+    def invalid!(msg)
+      raise ValidationError, msg
+    end
+
     # parse options, return remaining args
     def self.parse_opts(op, args)
       as = args.dup; op.parse! as; as
@@ -76,7 +81,7 @@ module Napp
     # validate value against regex
     # @raise ValidationError on no match
     def self.validate!(x, rx, name)
-      x.match /^(#{rx})$/ or raise ValidationError, "invalid #{name}"
+      x.match /^(#{rx})$/ || invalid! "invalid #{name}"
     end
 
     # --

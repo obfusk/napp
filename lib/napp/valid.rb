@@ -31,9 +31,20 @@ module Napp; module Valid
     end
   end
 
-  # validate repo
+  def self.path!(name, path)
+    Util.validate! path, PATH, name
+  end
+
+  def self.port!(port)
+    Util.validate! port, NUM, 'port'
+  end
+
   def self.repo!(repo)
-    Util.validate! repo, URL , 'repo'
+    Util.validate! repo, URL, 'repo'
+  end
+
+  def self.server!(server)
+    Util.validate! server, SERVER, 'server'
   end
 
 end; end

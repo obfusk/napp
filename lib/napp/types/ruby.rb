@@ -63,8 +63,18 @@ module Napp; module Types; module Ruby
     end
   end                                                           # }}}1
 
-  def self.validate!(cfg)
-  end
+  # validate type cfg; sets defaults; MODIFIES cfg
+  def self.validate!(cfg)                                       # {{{1
+    t = cfg.type; t.bootstrap = t.update unless t.bootstrap
+    Util.invalid! 'invalid: no socket or port' unless t.listen
+    Valid.port! t.port if t.listen == :port
+    # NB: nothing to validate for commands except presence
+    Util.invalid! 'no run command' unless t.run
+    Util.invalid! 'no bootstrap command' unless t.update
+    Valid.path! 'logdir', x.logdir
+    Valid.path! 'public', x.public
+    Valid.server! x.server if x.server
+  end                                                           # }}}1
 
   # --
 
