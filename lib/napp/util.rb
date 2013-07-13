@@ -9,6 +9,7 @@
 #
 # --                                                            ; }}}1
 
+require 'etc'
 require 'io/console'
 require 'optparse'
 
@@ -19,6 +20,7 @@ module Napp
   module Util
 
     class ArgError < Error; end
+    class CfgError < Error; end
     class SysError < Error; end
     class ValidationError < Error; end
 
@@ -146,6 +148,18 @@ module Napp
 
     # --
 
+    # home dir of (current) user
+    def self.dir_home(user = nil)
+      user ? Etc.getpwnam(user).dir : Dir.home
+    end
+
+    # user name
+    def self.user
+      Etc.getlogin
+    end
+
+    # --
+
     # print msg to stderr and exit
     def self.die!(msg)
       STDERR.puts msg; exit 1
@@ -162,11 +176,6 @@ module Napp
     # does file/dir or symlink exists?
     def self.exists?(path)
       File.exists?(path) || File.symlink?(path)
-    end
-
-    # write pid to file
-    def self.mkpid(file, pid)
-      File.open(file, 'w') { |f| f.puts pid }
     end
 
     # current time ('%F %T')

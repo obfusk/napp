@@ -1,0 +1,39 @@
+napp:
+  dirs:
+    # subdirectory of user(s) home directory in which apps reside
+    apps: apps
+
+    # log dir (see log_sudo)
+    log: /var/log/napp
+
+    # subdirectories of ~user/apps/$APP
+    app:
+      app: app
+      cfg: cfg
+      log: log
+      run: run
+
+  # main user
+  user: napp
+
+  # prefix for other users
+  user_prefix: napp-
+
+  # other users (w/o prefix)
+  users:
+    - foo
+    - bar
+    - baz
+
+  # use sudo w/ napp-log to append to log file
+  log_w_sudo: true
+
+# run/bootstrap/update command aliases
+commands:
+  BUNDLE:       bundle install
+  CUSTOM_BOOT:  ./_scripts/bootstrap
+  CUSTOM_UPD:   ./_scripts/update
+  PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
+  RACKUP:       bundle exec rackup -p ${PORT}
+  RAILS_BOOT:   napp-helper-bootstrap-rails
+  RAILS_UPD:    napp-helper-update-rails

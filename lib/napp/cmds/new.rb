@@ -22,16 +22,16 @@ module Napp; module Cmds; module New
   CmdCfg  = Util.struct *%w{ help }
 
   # parse opts, validate
-  def self.prepare(cfg, name, type, repo, args)                 # {{{1
-    Util.validate! name, Util::VALIDATE[:word], 'name'          # TODO
+  def self.prepare(cfg, name_, type, repo, args)                # {{{1
+    name  = Cfg.app_name name_
     Util.validate! type, Util::VALIDATE[:word], 'type'
     Util.validate! repo, Util::VALIDATE[:url] , 'repo'
     t     = Type.get type
     cmd   = CmdCfg.new help: false
-    app   = Cfg::App.new name: name, type: type, repo: repo,
+    app   = Cfg::App.new type: type, repo: repo,
                   vcs: VCS::DEFAULT, branch: VCS::DEFAULT_BRANCH
     extra = Cfg::Extra.new type: type, type_mod: t
-    cfg.cmd = cmd; cfg.app = app; cfg.extra = extra
+    cfg.cmd = cmd; cfg.name = name; cfg.app = app; cfg.extra = extra
     op    = opt_parser cfg
     as    = Util.parse_opts op, args
     as.empty? or raise Util::ArgError, 'too many arguments'
@@ -45,10 +45,7 @@ module Napp; module Cmds; module New
     name, type, repo, *args = Util.args 'new', args_, 3, nil
     prepare cfg, name, type, repo, args
 
-    # TODO {
-    require 'yaml'
-    puts Util.a_struct(app: cfg.app, type: cfg.type).to_yaml
-    # } TODO
+    require 'pry'; binding.pry
   end                                                           # }}}1
 
   # help message

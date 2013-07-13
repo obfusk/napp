@@ -2,7 +2,7 @@
 
     File        : README.md
     Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-    Date        : 2013-07-12
+    Date        : 2013-07-13
 
     Copyright   : Copyright (C) 2013  Felix C. Stegerman
     Version     : v0.2.0.dev
@@ -12,6 +12,7 @@
 ## TODO
 
   * ...
+  * validate cfg, input
   * obfuskd/napp
   * errors to STDERR?
 

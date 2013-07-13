@@ -16,8 +16,8 @@ require 'napp/util'
 module Napp; module Types; module Ruby
 
   DEFAULTS = {
-    listen: nil, port: nil, run: nil, bootstrap: nil, update: nil,
-    logdir: nil, public: nil, server: nil
+    type: 'ruby', listen: nil, port: nil, run: nil, bootstrap: nil,
+    update: nil, logdir: nil, public: nil, server: nil
   }
 
   TypeCfg = Util.struct *DEFAULTS.keys
