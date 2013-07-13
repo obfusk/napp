@@ -9,21 +9,75 @@
 #
 # --                                                            ; }}}1
 
+require 'napp/daemon'
+require 'napp/nginx'
+require 'napp/util'
+
 module Napp; module Types; module Ruby
 
-  # ...
+  DEFAULTS = {
+    listen: nil, port: nil, run: nil, bootstrap: nil, update: nil,
+    logdir: nil, public: nil, server: nil
+  }
 
-  # extends Cmd::New option parser -- TODO
+  Cfg = Util.struct *DEFAULTS.keys
+
+  # extends Cmd::New option parser
   def self.options(o, opts)                                     # {{{1
-    opts.ruby = Util.struct foo: nil, bar: nil
-
-    o.on('--foo FOO', '...') do |x|
-      opts.ruby.foo = x
+    opts.type = Cfg.new DEFAULTS unless opts.info.help
+    o.on('--socket', 'Listen on socket') do |x|
+      opts.type.listen = :socket
     end
-    o.on('--bar BAR', '...') do |x|
-      opts.ruby.bar = x
+    o.on('--port PORT', 'Listen on port') do |x|
+      opts.type.listen = :port
+      opts.type.port = x
+    end
+    o.on('--run CMD', 'Command to run app') do |x|
+      opts.type.run = x
+    end
+    o.on('--bootstrap CMD',
+         'Command to bootstrap app;',
+         'default is update command') do |x|
+      opts.type.bootstrap = x
+    end
+    o.on('--update CMD', 'Command to update app') do |x|
+      opts.type.update = x
+    end
+    o.on('--logdir DIR',
+         'Subdir of app with *.log files; optional') do |x|
+      opts.type.logdir = x
+    end
+    o.on('--public DIR',
+         'Subdir of app with public files; optional') do |x|
+      opts.type.public = x
+    end
+    o.on('--server NAME', 'Nginx server_name; optional') do |x|
+      opts.type.server = x
     end
   end                                                           # }}}1
+
+  def self.validate!(opts)
+  end
+
+  # --
+
+  def self.bootstrap(opts)
+  end
+
+  def self.status(opts)
+  end
+
+  def self.running?(opts)
+  end
+
+  def self.start(opts)
+  end
+
+  def self.stop(opts)
+  end
+
+  def self.restart(opts)
+  end
 
 end; end; end
 

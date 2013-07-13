@@ -24,11 +24,6 @@ module Napp
       which[type] or raise ArgumentError, "no such type: #{type}"
     end
 
-    # submodule name
-    def self.get_name(type)
-      type.name.sub(/.*::/, '')
-    end
-
     # type submodules
     def self.which
       Util.submodules Napp::Types

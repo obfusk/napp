@@ -59,11 +59,6 @@ module Napp
         .each { |x| require x }
     end                                                         # }}}1
 
-    # hash to struct
-    def self.struct(h = {})
-      Struct.new(*h.keys).new(*h.values)
-    end
-
     # get submodules as hash
     # e.g. submodules(Foo) -> { 'bar' => Foo::Bar, ... }
     def self.submodules(mod)                                    # {{{1
@@ -71,6 +66,25 @@ module Napp
             .map { |x| [x.downcase.to_s, mod.const_get(x)] } \
             .select { |k,v| v.class == Module } ]
     end                                                         # }}}1
+
+    # --
+
+    # new struct
+    def self.struct(*fields)                                    # {{{1
+      Class.new(Struct.new(*fields.map(&:to_sym))) do
+        def initialize(h = {})
+          h.each { |k,v| self[k] = v }
+        end
+        def to_h
+          Hash[each_pair.to_a]
+        end
+      end
+    end                                                         # }}}1
+
+    # hash to struct
+    def self.a_struct(h = {})
+      Struct.new(*h.keys).new(*h.values)
+    end
 
     # --
 
