@@ -38,6 +38,7 @@ module Napp; module Cmds; module New
     op    = opt_parser cfg
     as    = Util.parse_opts op, args
     as.empty? or raise Util::ArgError, 'too many arguments'
+    Valid.vcs! cfg.app.vcs; Valid.branch! cfg.app.branch
     cfg.extra.vcs_mod = VCS.get cfg.app.vcs
     t.validate! cfg
     nil

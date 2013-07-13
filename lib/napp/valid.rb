@@ -15,16 +15,16 @@ module Napp; module Valid
 
   # NB: keep it simple: some false positives, nothing dangerous
 
-  NUM     = %r{\d+}
-  WORD    = %r{[a-z0-9_-]+}
+  NUM     = %r{[0-9]+}
+  WORD    = %r{[a-zA-Z0-9_-]+}
   PATH    = %r{(#{WORD}/)*#{WORD}}
   SERVER  = %r{[a-z0-9.*-]+|_}
-  URL     = %r{[a-z0-9A-Z@.:/_-]+}                              # TODO
+  URL     = %r{[a-zA-Z0-9@.:/_-]+}                              # TODO
 
   # --
 
   class << self
-    %w{ type vcs branch }.each do |x|
+    %w{ branch type vcs }.each do |x|
       define_method "#{x}!" do |v|
         Util.validate! v, WORD, x
       end

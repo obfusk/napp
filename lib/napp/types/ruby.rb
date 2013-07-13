@@ -21,7 +21,7 @@ module Napp; module Types; module Ruby
   }
 
   DEFAULT_LOG = 'log'
-  DEFAULT_PUB = 'pub'
+  DEFAULT_PUB = 'public'
 
   TypeCfg = Util.struct *DEFAULTS.keys
 
@@ -50,12 +50,12 @@ module Napp; module Types; module Ruby
     end
     o.on('--logdir [DIR]',
          'Subdir of app with *.log files; optional;',
-         "default with no argument is #{DEFAULT_LOG}") do |x|
+         "default DIR is #{DEFAULT_LOG}") do |x|
       cfg.type.logdir = x || DEFAULT_LOG
     end
     o.on('--public [DIR]',
          'Subdir of app with public files; optional;',
-         "default with no argument is #{DEFAULT_PUB}") do |x|
+         "default DIR is #{DEFAULT_PUB}") do |x|
       cfg.type.public = x || DEFAULT_PUB
     end
     o.on('--server NAME', 'Nginx server_name; optional') do |x|
@@ -70,10 +70,10 @@ module Napp; module Types; module Ruby
     Valid.port! t.port if t.listen == :port
     # NB: nothing to validate for commands except presence
     Util.invalid! 'no run command' unless t.run
-    Util.invalid! 'no bootstrap command' unless t.update
-    Valid.path! 'logdir', x.logdir
-    Valid.path! 'public', x.public
-    Valid.server! x.server if x.server
+    Util.invalid! 'no update command' unless t.update
+    Valid.path! 'logdir', t.logdir if t.logdir
+    Valid.path! 'public', t.public if t.public
+    Valid.server! t.server if t.server
   end                                                           # }}}1
 
   # --

@@ -53,7 +53,7 @@ module Napp
     end
 
     # @raise ValidationError
-    def invalid!(msg)
+    def self.invalid!(msg)
       raise ValidationError, msg
     end
 
@@ -81,7 +81,7 @@ module Napp
     # validate value against regex
     # @raise ValidationError on no match
     def self.validate!(x, rx, name)
-      x.match /^(#{rx})$/ || invalid! "invalid #{name}"
+      x.to_s.match /^(#{rx})$/ or invalid! "invalid #{name}"
     end
 
     # --
