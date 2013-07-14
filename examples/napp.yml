@@ -28,16 +28,17 @@ napp:
   # use sudo w/ napp-log to append to log file
   log_w_sudo: true
 
-# run/bootstrap/update command aliases
-commands:
-  BUNDLE:       bundle install
-  CUSTOM_BOOT:  ./_scripts/bootstrap
-  CUSTOM_UPD:   ./_scripts/update
-  PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
-  RACKUP:       SIGINT bundle exec rackup -E production ${LISTEN}
-  RAILS_BOOT:   napp-helper-bootstrap-rails
-  RAILS_UPD:    napp-helper-update-rails
-
 defaults:
   vcs: git
   branch: master
+
+commands:
+  # run/bootstrap/update command aliases
+  aliases:
+    BUNDLE:       bundle install
+    CUSTOM_BOOT:  ./_scripts/bootstrap
+    CUSTOM_UPD:   ./_scripts/update
+    PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
+    RACKUP:       SIGINT bundle exec rackup -E production ${LISTEN}
+    RAILS_BOOT:   napp-helper-bootstrap-rails
+    RAILS_UPD:    napp-helper-update-rails
