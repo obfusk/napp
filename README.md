@@ -11,10 +11,20 @@
 
 ## TODO
 
-  * ...
+  * build:
+    - napp
+    - napps
+    - napp-update
+    - napp-helper-\*
+    - nappmin-ssh
+    - nappmin-web
+  * docs! website! screenshots! examples!
+  * test test test !!!
+  * test nginx conf files!
   * validate cfg, input + defaults
   * obfuskd/napp
   * errors to STDERR?
+  * set version in README + version.rb
 
 ## Description
 []: {{{1

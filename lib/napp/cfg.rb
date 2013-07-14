@@ -2,7 +2,7 @@
 #
 # File        : napp/cfg.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-13
+# Date        : 2013-07-14
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -32,11 +32,16 @@ module Napp; module Cfg
 
   # --
 
-  Name = Util.struct *%w{ user app } do
-    def join
-      "#{user}/#{app}"
+  Name = Util.struct *%w{ user app } do                         # {{{1
+    # join: user+sep+app
+    def join(sep = '/')
+      "#{user}#{sep}#{app}"
     end
-  end
+    # safe join
+    def safe
+      "#{user.downcase}_S_#{app.downcase}".gsub('-', '_D_')
+    end
+  end                                                           # }}}1
 
   # --
 
@@ -70,25 +75,27 @@ module Napp; module Cfg
   end
 
   # app dir
-  def self.dir_app(cfg)
-    h = Util.home cfg.name.user
-    "#{h}/#{cfg.global.dirs.apps}/#{cfg.name.app}"
+  def self.dir_app(cfg, *paths)
+    ([Util.home(cfg.name.user), cfg.global.dirs.apps, cfg.name.app] +
+      paths).join '/'
   end
 
-  def self.dir_app_app(cfg)
-    "#{dir_app cfg}/#{cfg.global.dirs.app.app}"
+  # --
+
+  def self.dir_app_app(cfg, *paths)
+    dir_app cfg, cfg.global.dirs.app.app, *paths
   end
 
-  def self.dir_app_cfg(cfg)
-    "#{dir_app cfg}/#{cfg.global.dirs.app.cfg}"
+  def self.dir_app_cfg(cfg, *paths)
+    dir_app cfg, cfg.global.dirs.app.cfg, *paths
   end
 
-  def self.dir_app_log(cfg)
-    "#{dir_app cfg}/#{cfg.global.dirs.app.log}"
+  def self.dir_app_log(cfg, *paths)
+    dir_app cfg, cfg.global.dirs.app.log, *paths
   end
 
-  def self.dir_app_run(cfg)
-    "#{dir_app cfg}/#{cfg.global.dirs.app.run}"
+  def self.dir_app_run(cfg, *paths)
+    dir_app cfg, cfg.global.dirs.app.run, *paths
   end
 
   # --
@@ -115,6 +122,11 @@ module Napp; module Cfg
     "#{dir_app_cfg cfg}/type.yml"
   end
 
+  # nginx.conf path
+  def self.file_app_cfg_nginx(cfg)
+    "#{dir_app_cfg cfg}/nginx.conf"
+  end
+
   # napp.log path
   def self.file_app_log(cfg)
     "#{dir_app_log cfg}/nap.log"
@@ -123,6 +135,11 @@ module Napp; module Cfg
   # daemon.pid path
   def self.file_app_pid(cfg)
     "#{dir_app_run cfg}/daemon.pid"
+  end
+
+  # daemon.sock path
+  def self.file_app_sock(cfg)
+    "#{dir_app_run cfg}/daemon.sock"
   end
 
   # --

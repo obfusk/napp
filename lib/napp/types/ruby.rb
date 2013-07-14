@@ -2,7 +2,7 @@
 #
 # File        : napp/types/ruby.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-13
+# Date        : 2013-07-14
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -17,7 +17,8 @@ module Napp; module Types; module Ruby
 
   DEFAULTS = {
     type: 'ruby', listen: nil, port: nil, run: nil, bootstrap: nil,
-    update: nil, logdir: nil, public: nil, server: nil
+    update: nil, logdir: nil, public: nil, server: nil, ssl: false,
+    default_server: false
   }
 
   DEFAULT_LOG = 'log'
@@ -61,6 +62,13 @@ module Napp; module Types; module Ruby
     o.on('--server NAME', 'Nginx server_name; optional') do |x|
       cfg.type.server = x
     end
+    o.on('--[no-]ssl', 'Nginx w/ ssl; default is no') do |x|
+      cfg.type.ssl = x
+    end
+    o.on('--[no-]default-server',
+         'Nginx w/ default_server; default is no') do |x|
+      cfg.type.default_server = x
+    end
   end                                                           # }}}1
 
   # validate type cfg; sets defaults; MODIFIES cfg
@@ -73,7 +81,13 @@ module Napp; module Types; module Ruby
     Util.invalid! 'no update command' unless t.update
     Valid.path! 'logdir', t.logdir if t.logdir
     Valid.path! 'public', t.public if t.public
-    Valid.server! t.server if t.server
+    if t.server
+      Valid.server! t.server
+    else
+      Util.invalid! 'invalid: ssl w/o server' if t.ssl
+      Util.invalid! 'invalid: default_server w/o server' \
+        if t.default_server
+    end
   end                                                           # }}}1
 
   # --
