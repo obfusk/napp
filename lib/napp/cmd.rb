@@ -36,7 +36,7 @@ module Napp
     # help message
     def self.help(cfg)
       "Usage: #{ USAGE }\n\n" +
-      "Commands: #{ which.keys.sort.join ', ' }\n"
+      "Commands: #{ which.keys.sort*', ' }\n"
     end
 
     # --

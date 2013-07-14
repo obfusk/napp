@@ -10,6 +10,7 @@
 # --                                                            ; }}}1
 
 require 'etc'
+require 'fileutils'
 require 'io/console'
 require 'optparse'
 
@@ -88,16 +89,22 @@ module Napp
 
     # --
 
-    # new struct
+    # new struct w/ fields and optional block to be class eval'd
     def self.struct(*fields, &b)                                # {{{1
       Class.new(Struct.new(*fields.map(&:to_sym))) do
+        # init w/ hash
         def initialize(h = {})
           h.each { |k,v| self[k] = v }
         end
         unless method_defined? :to_h
+          # convert to hash (ruby 2 has this already)
           def to_h
             Hash[each_pair.to_a]
           end
+        end
+        # convert to hash w/ string keys
+        def to_str_h
+          Hash[to_h.map { |k,v| [k.to_s,v] }]
         end
         self.class_eval &b if b
       end
@@ -112,7 +119,18 @@ module Napp
 
     # info message; "==> <msg>" w/ colours
     def self.ohai(msg)
-      puts col(:blu) + '==>' + col(:whi) + ' ' + msg + col(:non)
+      puts col(:blu) + '==> ' + col(:whi) + msg + col(:non)
+    end
+
+    # info message; "==> <msg>: <what>" w/ colours
+    def self.onow(msg, *what)
+      puts col(:grn) + '==> ' + col(:whi) + msg + col(:non) +
+        (what.empty? ? '' : _owhat(what))
+    end
+
+    # (helper for onow)
+    def self._owhat(what)
+      ': ' + what.map { |x| col(:grn) + x + col(:non) } *', '
     end
 
     # error message + log; "<label>: <msg>" w/ colours
@@ -185,6 +203,12 @@ module Napp
       File.exists?(path) || File.symlink?(path)
     end
 
+    # mkdir_p + ohai
+    def self.mkdir_p(*paths)
+      ohai "mkdir -p #{paths*' '}"
+      FileUtils.mkdir_p paths
+    end
+
     # current time ('%F %T')
     def self.now(fmt = '%F %T')
       Time.now.strftime fmt
@@ -234,7 +258,7 @@ module Napp
 
     # ohai + run command
     def self.run(*args)
-      ohai args.join ' '; sys *args
+      ohai args*' '; sys *args
     end
 
   end

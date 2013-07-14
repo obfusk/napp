@@ -63,6 +63,12 @@ module Napp; module Cfg
 
   # --
 
+  # app dirs
+  def self.dirs_app(cfg)
+    %w{ dir_app dir_app_app dir_app_cfg dir_app_log dir_app_run } \
+      .map { |x| send x, cfg }
+  end
+
   # app dir
   def self.dir_app(cfg)
     h = Util.home cfg.name.user
@@ -92,6 +98,13 @@ module Napp; module Cfg
     "#{cfg.nappcfg}/napp.yml"
   end
 
+  # global napp.log path
+  def self.file_log(cfg)
+    "#{cfg.global.dirs.log}/nap.log"
+  end
+
+  # --
+
   # app.yml path
   def self.file_app_cfg_app(cfg)
     "#{dir_app_cfg cfg}/app.yml"
@@ -100,6 +113,16 @@ module Napp; module Cfg
   # type.yml path
   def self.file_app_cfg_type(cfg)
     "#{dir_app_cfg cfg}/type.yml"
+  end
+
+  # napp.log path
+  def self.file_app_log(cfg)
+    "#{dir_app_log cfg}/nap.log"
+  end
+
+  # daemon.pid path
+  def self.file_app_pid(cfg)
+    "#{dir_app_run cfg}/daemon.pid"
   end
 
   # --
@@ -140,12 +163,12 @@ module Napp; module Cfg
 
   # dump App to YAML string
   def self.dump_app(cfg)
-    YAML.dump cfg.app.to_h
+    YAML.dump cfg.app.to_str_h
   end
 
   # dump App to YAML app cfg file
-  def self.save_app(cfg, app)
-    File.write file_app_cfg_app(cfg), dump_app(app)
+  def self.save_app(cfg)
+    File.write file_app_cfg_app(cfg), dump_app(cfg)
   end
 
   # --
@@ -162,12 +185,12 @@ module Napp; module Cfg
 
   # dump type to YAML string
   def self.dump_type(cfg)
-    YAML.dump cfg.type.to_h
+    YAML.dump cfg.type.to_str_h
   end
 
   # dump type to YAML app cfg file
-  def self.save_type(cfg, type)
-    File.write file_app_cfg_type(cfg), dump_type(type)
+  def self.save_type(cfg)
+    File.write file_app_cfg_type(cfg), dump_type(cfg)
   end
 
   # --

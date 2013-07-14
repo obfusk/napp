@@ -26,7 +26,8 @@ module Napp; module Cmds; module New
   # --
 
   # parse opts, validate; MODIFIES cfg
-  def self.prepare(cfg, name_, type, repo, args)                # {{{1
+  def self.prepare(cfg, args_)                                  # {{{1
+    name_, type, repo, *args = Util.args 'new', args_, 3, nil
     Valid.type! type; Valid.repo! repo
     name  = Cfg.app_name name_
     t     = Type.get type
@@ -46,14 +47,17 @@ module Napp; module Cmds; module New
 
   # create new app: clone + cfg
   def self.run(cfg, *args_)                                     # {{{1
-    name, type, repo, *args = Util.args 'new', args_, 3, nil
-    prepare cfg, name, type, repo, args
-
-    Log.olog cfg, "creating ..."
-    Util.odie cfg, "app #{cfg.name.join} already exists" \
+    prepare cfg, args_; name = cfg.name.join; app = cfg.app
+    Log.olog cfg, "creating `#{name}' ..."
+    Util.odie cfg, "app `#{name}' already exists" \
       if Util.exists? Cfg.dir_app(cfg)
-
-    # ...
+    Util.onow 'Adding new app', name
+    Util.mkdir_p Cfg.dirs_app(cfg)
+    cfg.extra.vcs_mod.clone app.repo, Cfg.dir_app_app(cfg), app.branch
+    Util.onow 'Saving', *%w{ app.yml type.yml }
+    Cfg.save_app cfg; Cfg.save_type cfg
+    Util.onow 'Done.'
+    Log.olog cfg, "`#{name}' created."
   end                                                           # }}}1
 
   # help message; MODIFIES cfg
@@ -65,8 +69,8 @@ module Napp; module Cmds; module New
     cfg.extra = Cfg::Extra.new type: type, type_mod: t
     "Usage: #{ USAGE }\n\n" +
     opt_parser(cfg).help + "\n" +
-    "Types: #{ Type.which.keys.sort.join ', ' }\n" +
-    "VCSs: #{ VCS.which.keys.sort.join ', ' }\n"
+    "Types: #{ Type.which.keys.sort*', ' }\n" +
+    "VCSs: #{ VCS.which.keys.sort*', ' }\n"
   end                                                           # }}}1
 
   # option parser; extended by cfg.extra.type_mod.options;
