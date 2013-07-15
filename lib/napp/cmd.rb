@@ -49,7 +49,7 @@ module Napp
       if !cmd
         puts "Usage: #{USAGE}"
       elsif cmd == 'version'
-        puts "napp v#{Napp::VERSION}"
+        puts "napp version #{Napp::VERSION}"
       elsif cmd == 'help'
         run_help cfg, *args
       elsif c = which[cmd]
