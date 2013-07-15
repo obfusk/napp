@@ -2,13 +2,14 @@
 #
 # File        : napp/cmd.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-14
+# Date        : 2013-07-15
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
 #
 # --                                                            ; }}}1
 
+require 'napp/log'
 require 'napp/util'
 require 'napp/version'
 
@@ -25,13 +26,15 @@ module Napp
 
     # --
 
-    # run/dispatch; *Error -> udie!
+    # run/dispatch; input error -> udie!; sys error -> odie
     def self.run(cfg, *args)                                    # {{{1
       begin
         run_cmd cfg, *args
       rescue Util::ArgError, Util::ValidationError,
              OptionParser::ParseError => e
         Util.udie! USAGE, e.message
+      rescue Util::SysError => e
+        Util.odie cfg, e.message
       end
     end                                                         # }}}1
 

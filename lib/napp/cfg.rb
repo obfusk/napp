@@ -120,27 +120,27 @@ module Napp; module Cfg
 
   # app.yml path
   def self.file_app_cfg_app(cfg)
-    "#{dir_app_cfg cfg}/app.yml"
+    dir_app_cfg cfg, 'app.yml'
   end
 
   # type.yml path
   def self.file_app_cfg_type(cfg)
-    "#{dir_app_cfg cfg}/type.yml"
+    dir_app_cfg cfg, 'type.yml'
   end
 
   # napp.log path
   def self.file_app_log(cfg)
-    "#{dir_app_log cfg}/nap.log"
+    dir_app_log cfg, 'nap.log'
   end
 
   # daemon.pid path
   def self.file_app_pid(cfg)
-    "#{dir_app_run cfg}/daemon.pid"
+    dir_app_run cfg, 'daemon.pid'
   end
 
   # daemon.sock path
   def self.file_app_sock(cfg)
-    "#{dir_app_run cfg}/daemon.sock"
+    dir_app_run cfg, 'daemon.sock'
   end
 
   # --

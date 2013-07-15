@@ -26,6 +26,8 @@
   * errors to STDERR?
   * set version in README + version.rb
   * remove `DEBUG_PRY`
+  * should init script remove old pid files ?!
+  * what about pid file command checks ?!
 
 ## Description
 []: {{{1

@@ -86,6 +86,11 @@ module Napp
       x.to_s.match /^(#{rx})$/ or invalid! "invalid #{name}"
     end
 
+    # @raise ValidationError if pid is not an integer
+    def self.validate_pid!(pid)
+      pid.is_a? Integer or raise ValidationError, 'invalid PID'
+    end
+
     # --
 
     # hash to struct
@@ -101,10 +106,11 @@ module Napp
           h.each { |k,v| self[k] = v }
         end
         # mandatory new
+        # @raise CfgError if any fields are nil
         def self.mnew(h = {})
           x = self.new h
           x.members.each do |f|
-            x[f].nil? and raise ValidationError, "empty field: #{f}"
+            x[f].nil? and raise CfgError, "empty field: #{f}"
           end
           x
         end
@@ -140,18 +146,19 @@ module Napp
       ': ' + what.map { |x| col(:grn) + x + col(:non) } *', '
     end
 
-    # error message + log; "<label>: <msg>" w/ colours
+    # error message + log; "<label>: <msg>" w/ colours; also logs;
+    # REQUIRES napp/log
     def self.onoe(cfg, msg, label = 'Error')
       STDERR.puts cole(:red) + label + cole(:non) + ': ' + msg
       Log.olog cfg, "#{label}: #{msg}"
     end
 
-    # warning message (onoe w/ label 'Warning')
+    # warning message (onoe w/ label 'Warning'); REQUIRES napp/log
     def self.opoo(cfg, msg)
       onoe cfg, msg, 'Warning'
     end
 
-    # onoe/die!
+    # onoe/die!; REQUIRES napp/log
     def self.odie(*args)
       onoe *args; die!
     end
@@ -209,6 +216,13 @@ module Napp
 
     # --
 
+    # process alive? returns false/true/:not_mine
+    def self.alive?(pid)
+      Process.kill 0, pid; true
+    rescue Errno::EPERM; :not_mine
+    rescue Errno::ESRCH; false
+    end
+
     # does file/dir or symlink exists?
     def self.exists?(path)
       File.exists?(path) || File.symlink?(path)
@@ -223,6 +237,11 @@ module Napp
     # current time ('%F %T')
     def self.now(fmt = '%F %T')
       Time.now.strftime fmt
+    end
+
+    # get process age information from ps
+    def self.process_age(pid)
+      %x[ ps -p #{pid} -o etime= ].gsub(/\s/, '')
     end
 
     # prompt for line; optionally hide input
@@ -264,8 +283,15 @@ module Napp
         "failed to run command #{ ([cmd] + args) } (#$?)"
     end
 
+    # --
+
+    # ohai + spawn command
+    def self.ospw(*args)
+      ohai args*' '; spw *args
+    end
+
     # ohai + run command
-    def self.run(*args)
+    def self.osys(*args)
       ohai args*' '; sys *args
     end
 

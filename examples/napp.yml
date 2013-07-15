@@ -37,6 +37,8 @@ defaults:                                                       # {{{1
   app:
     vcs: git
     branch: master
+  daemon:
+    wait: 7
   nginx:
     validate_server_name: true
     max_body_size:      # nginx default
