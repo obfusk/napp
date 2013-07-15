@@ -219,7 +219,8 @@ module Napp
     # prompt for line; optionally hide input
     def self.prompt(prompt, hide = false)
       print prompt; STDOUT.flush
-      line = hide ? STDIN.noecho { |i| i.gets } .tap { puts } : gets
+      line = hide ? STDIN.noecho { |i| i.gets } .tap { puts } :
+                    STDIN.gets
       line && line.chomp
     end
 
