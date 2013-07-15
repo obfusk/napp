@@ -49,6 +49,7 @@ install-shallow:
 
 clean:
 	rm -fr *.gem *.tar _archive _tmp examples/nginx.d
+	find -name '*~' -delete
 
 archive: all
 	./_scripts/archive
