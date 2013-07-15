@@ -2,7 +2,7 @@
 #
 # File        : napp/types/ruby.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-14
+# Date        : 2013-07-15
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -17,12 +17,10 @@ module Napp; module Types; module Ruby
 
   DEFAULTS = {
     type: 'ruby', listen: nil, port: nil, run: nil, bootstrap: nil,
-    update: nil, logdir: nil, public: nil, server: nil, ssl: false,
-    default_server: false
+    update: nil, logdir: nil, public: nil, nginx_server: nil,
+    nginx_ssl: nil, nginx_default_server: nil,
+    nginx_max_body_size: nil, nginx_proxy_buffering_off: nil
   }
-
-  DEFAULT_LOG = 'log'
-  DEFAULT_PUB = 'public'
 
   TypeCfg = Util.struct *DEFAULTS.keys
 
@@ -30,7 +28,8 @@ module Napp; module Types; module Ruby
 
   # extends Cmd::New option parser; MODIFIES cfg
   def self.options(o, cfg)                                      # {{{1
-    cfg.type = TypeCfg.new DEFAULTS unless cfg.cmd.help
+    cfg.type  = TypeCfg.new DEFAULTS unless cfg.cmd.help
+    d         = cfg.global.defaults['ruby']
     o.on('--socket', 'Listen on socket') do |x|
       cfg.type.listen = :socket
     end
@@ -51,24 +50,15 @@ module Napp; module Types; module Ruby
     end
     o.on('--logdir [DIR]',
          'Subdir of app with *.log files; optional;',
-         "default DIR is #{DEFAULT_LOG}") do |x|
-      cfg.type.logdir = x || DEFAULT_LOG
+         "default DIR is #{d['logdir']}") do |x|
+      cfg.type.logdir = x || d['logdir']
     end
     o.on('--public [DIR]',
          'Subdir of app with public files; optional;',
-         "default DIR is #{DEFAULT_PUB}") do |x|
-      cfg.type.public = x || DEFAULT_PUB
+         "default DIR is #{d['public']}") do |x|
+      cfg.type.public = x || d['public']
     end
-    o.on('--server NAME', 'Nginx server_name; optional') do |x|
-      cfg.type.server = x
-    end
-    o.on('--[no-]ssl', 'Nginx w/ ssl; default is no') do |x|
-      cfg.type.ssl = x
-    end
-    o.on('--[no-]default-server',
-         'Nginx w/ default_server; default is no') do |x|
-      cfg.type.default_server = x
-    end
+    Nginx.options(o, cfg)
   end                                                           # }}}1
 
   # validate type cfg; sets defaults; MODIFIES cfg
@@ -81,13 +71,7 @@ module Napp; module Types; module Ruby
     Util.invalid! 'no update command' unless t.update
     Valid.path! 'logdir', t.logdir if t.logdir
     Valid.path! 'public', t.public if t.public
-    if t.server
-      Valid.server! t.server
-    else
-      Util.invalid! 'invalid: ssl w/o server' if t.ssl
-      Util.invalid! 'invalid: default_server w/o server' \
-        if t.default_server
-    end
+    Nginx.validate! cfg
   end                                                           # }}}1
 
   # --

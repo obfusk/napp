@@ -2,7 +2,7 @@
 #
 # File        : napp/util.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-14
+# Date        : 2013-07-15
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -13,6 +13,7 @@ require 'etc'
 require 'fileutils'
 require 'io/console'
 require 'optparse'
+require 'pathname'
 
 module Napp
 

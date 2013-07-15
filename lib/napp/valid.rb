@@ -2,7 +2,7 @@
 #
 # File        : napp/valid.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-13
+# Date        : 2013-07-15
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -29,6 +29,10 @@ module Napp; module Valid
         Util.validate! v, WORD, x
       end
     end
+  end
+
+  def self.max_body_size!(size)
+    Util.validate! size, /^([0-9]+m|0)$/, 'max_body_size'
   end
 
   def self.path!(name, path)

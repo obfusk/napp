@@ -2,7 +2,7 @@
 #
 # File        : napp/nginx.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-14
+# Date        : 2013-07-15
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -12,6 +12,54 @@
 require 'napp/cfg'
 
 module Napp; module Nginx
+
+  # server: nil, ssl: nil,
+  # proxy_buffering_off: nil
+
+  # extends Cmd::New/type option parser; MODIFIES cfg
+  def self.options(o, cfg)                                      # {{{1
+    d   = cfg.global.defaults['nginx']
+    mbs = d['max_body_size'] || '?'                             # TODO
+    o.on('--server NAME', 'Nginx server_name; optional') do |x|
+      cfg.type.nginx_server = x
+    end
+    o.on('--[no-]ssl', "Nginx w/ ssl; default is #{d['ssl']}") do |x|
+      cfg.type.nginx_ssl = x
+    end
+    o.on('--[no-]default-server',
+         'Nginx w/ default_server; default is no') do |x|
+      cfg.type.nginx_default_server = x
+    end
+    o.on('--max-body-size SIZE',
+         "Nginx client_max_body_size; default is #{mbs}") do |x|
+      cfg.type.nginx_max_body_size = x
+    end
+  end                                                           # }}}1
+
+  # validate type cfg; sets defaults; MODIFIES cfg
+  def self.validate!(cfg)                                       # {{{1
+    t = cfg.type
+    d = cfg.global.defaults['nginx']
+    t.nginx_ssl = d['ssl'] if t.nginx_ssl.nil?
+    t.nginx_max_body_size ||= d['max_body_size']
+    t.nginx_proxy_buffering_off = d['proxy_buffering_off'] \
+      if t.nginx_proxy_buffering_off.nil?
+    # ...
+    if t.nginx_server
+      Valid.server! t.nginx_server
+      Valid.max_body_size! t.nginx_max_body_size
+    else
+      Util.invalid! 'invalid: ssl w/o server' if t.nginx_ssl
+      Util.invalid! 'invalid: default_server w/o server' \
+        if t.nginx_default_server
+      Util.invalid! 'invalid: max_body_size w/o server' \
+        if t.nginx_max_body_size
+      # ...
+    end
+    # ...
+  end                                                           # }}}1
+
+  # --
 
   # create nginx config
   # listen must be { socket: socket, name: name };
@@ -63,8 +111,8 @@ module Napp; module Nginx
     END
   end                                                           # }}}1
 
-  # create config using cfg, then show
-  def self.show_config(cfg)                                     # {{{1
+  # create config using cfg
+  def self.config(cfg)                                          # {{{1
     t       = cfg.type
     listen  = t.listen == :socket ?
       { socket: Cfg.file_app_sock(cfg), name: cfg.name.safe } :
@@ -74,7 +122,7 @@ module Napp; module Nginx
     public  = t.public && Cfg.dir_app_app(cfg, t.public)
     opts    = { public: public, ssl: t.ssl,
                 default_server: t.default_server }
-    puts create_config(listen, server, logdir, opts)
+    create_config(listen, server, logdir, opts)
   end                                                           # }}}1
 
 end; end

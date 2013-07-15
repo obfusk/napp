@@ -6,6 +6,9 @@ napp:
     # log dir (see log_sudo)
     log: /var/log/napp
 
+    # nginx config dir; relative to $NAPPCFG or absolute
+    nginx: nginx.d
+
     # subdirectories of ~user/apps/$APP
     app:
       app: app
@@ -29,8 +32,16 @@ napp:
   log_w_sudo: true
 
 defaults:
-  vcs: git
-  branch: master
+  app:
+    vcs: git
+    branch: master
+  nginx:
+    max_body_size:
+    proxy_buffering_off: false
+    ssl: false
+  ruby:
+    logdir: log
+    public: public
 
 commands:
   # run/bootstrap/update command aliases

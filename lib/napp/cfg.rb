@@ -2,7 +2,7 @@
 #
 # File        : napp/cfg.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-14
+# Date        : 2013-07-15
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -27,7 +27,7 @@ module Napp; module Cfg
                              commands defaults logfiles }
   App     = Util.struct *%w{ type repo vcs branch }
   Extra   = Util.struct *%w{ type type_mod vcs_mod }
-  Dirs    = Util.struct *%w{ apps log app }
+  Dirs    = Util.struct *%w{ apps log nginx app }
   AppDirs = Util.struct *%w{ app cfg log run }
 
   # --
@@ -108,6 +108,12 @@ module Napp; module Cfg
   # global napp.log path
   def self.file_log(cfg)
     "#{cfg.global.dirs.log}/nap.log"
+  end
+
+  # global nginx config dir path
+  def self.dir_nginx(cfg)
+    p = cfg.global.dirs.nginx
+    Pathname.new(p).absolute? ? p : "#{cfg.nappcfg}/#{p}"
   end
 
   # --

@@ -2,7 +2,7 @@
 #
 # File        : napp/cmds/new.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-14
+# Date        : 2013-07-15
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -33,8 +33,8 @@ module Napp; module Cmds; module New
     t     = Type.get type
     cmd   = CmdCfg.new help: false
     app   = Cfg::App.new type: type, repo: repo,
-              vcs: cfg.global.defaults['vcs'],
-              branch: cfg.global.defaults['branch']
+              vcs: cfg.global.defaults['app']['vcs'],
+              branch: cfg.global.defaults['app']['branch']
     extra = Cfg::Extra.new type: type, type_mod: t
     cfg.cmd = cmd; cfg.name = name; cfg.app = app; cfg.extra = extra
     op    = opt_parser cfg
