@@ -63,8 +63,8 @@ module Napp; module Nginx
     END
   end                                                           # }}}1
 
-  # create + write config
-  def self.write_config(cfg)                                    # {{{1
+  # create config using cfg, then show
+  def self.show_config(cfg)                                     # {{{1
     t       = cfg.type
     listen  = t.listen == :socket ?
       { socket: Cfg.file_app_sock(cfg), name: cfg.name.safe } :
@@ -74,8 +74,7 @@ module Napp; module Nginx
     public  = t.public && Cfg.dir_app_app(cfg, t.public)
     opts    = { public: public, ssl: t.ssl,
                 default_server: t.default_server }
-    File.write Cfg.file_app_cfg_nginx(cfg),
-      create_config(listen, server, logdir, opts)
+    puts create_config(listen, server, logdir, opts)
   end                                                           # }}}1
 
 end; end

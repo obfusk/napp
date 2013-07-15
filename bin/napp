@@ -7,15 +7,8 @@ end
 require 'napp/cfg'
 require 'napp/cmd'
 require 'napp/util'
-require 'napp/version'
-
-puts "napp v#{Napp::VERSION}\n\n"
 
 cfg         = Napp::Cfg::All.new nappcfg: Napp::Cfg.nappcfg
 cfg.global  = Napp::Cfg.read_global cfg
 
-begin
-  Napp::Cmd.run cfg, *ARGV
-rescue Napp::Util::Die => e
-  Napp::Util.do_die! e
-end
+Napp::Cmd.run cfg, *ARGV

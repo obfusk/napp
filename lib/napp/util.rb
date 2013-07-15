@@ -2,7 +2,7 @@
 #
 # File        : napp/util.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-13
+# Date        : 2013-07-14
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -19,8 +19,6 @@ module Napp
   class Error < RuntimeError; end
 
   module Util
-
-    class Die < Error; end
 
     class ArgError < Error; end
     class CfgError < Error; end
@@ -135,7 +133,7 @@ module Napp
 
     # error message + log; "<label>: <msg>" w/ colours
     def self.onoe(cfg, msg, label = 'Error')
-      puts col(:red) + label + col(:non) + ': ' + msg
+      STDERR.puts cole(:red) + label + cole(:non) + ': ' + msg
       Log.olog cfg, "#{label}: #{msg}"
     end
 
@@ -144,16 +142,21 @@ module Napp
       onoe cfg, msg, 'Warning'
     end
 
-    # onoe + exit
+    # onoe/die!
     def self.odie(*args)
-      onoe *args; exit 1
+      onoe *args; die!
     end
 
     # --
 
     # colour code (or '' if not tty)
-    def self.col(x)
-      tty? ? COLOURS[x] : ''
+    def self.col(x, what = :out)
+      tty?(what) ? COLOURS.fetch(x) : ''
+    end
+
+    # colour code for STDERR
+    def self.cole(x)
+      col(x, :err)
     end
 
     # terminal columns (cached)
@@ -161,9 +164,9 @@ module Napp
       @cols ||= %x[ TERM=${TERM:-dumb} tput cols ].to_i
     end
 
-    # is STDOUT a tty? (cached)
-    def self.tty?
-      @tty ||= STDOUT.isatty
+    # is STDOUT (or STDERR) a tty?
+    def self.tty?(what = :out)
+      (what == :out ? STDOUT : STDERR).isatty
     end
 
     # --
@@ -180,20 +183,19 @@ module Napp
 
     # --
 
-    # @raise Die
-    def self.die!(msg)
-      raise Die, msg
+    # helper for {,u}die!
+    def self._die_msgs(msgs)
+      msgs.each { |m| STDERR.puts "Error: #{m}" }
     end
 
-    # print e.message to stderr and exit
-    def self.do_die!(e)
-      STDERR.puts e.message; exit 1
+    # prints msgs to stderr and dies
+    def self.die!(*msgs)
+      _die_msgs msgs; exit 1
     end
 
     # prints msgs to stderr and dies with usage
-    def self.fail!(usage, *msgs)
-      msgs.each { |m| STDERR.puts "Error: #{m}" }
-      die! "Usage: #{usage}"
+    def self.udie!(usage, *msgs)
+      _die_msgs msgs; STDERR.puts "Usage: #{usage}"; die!
     end
 
     # --
@@ -215,15 +217,11 @@ module Napp
     end
 
     # prompt for line; optionally hide input
-    def self.prompt(prompt, hide = false)                       # {{{1
-      STDOUT.print prompt; STDOUT.flush
-      line = if hide
-        l = STDIN.noecho { |i| i.gets }; STDOUT.puts; l
-      else
-        STDIN.gets
-      end
+    def self.prompt(prompt, hide = false)
+      print prompt; STDOUT.flush
+      line = hide ? STDIN.noecho { |i| i.gets } .tap { puts } : gets
       line && line.chomp
-    end                                                         # }}}1
+    end
 
     # --
 

@@ -77,7 +77,7 @@ module Napp; module Cfg
   # app dir
   def self.dir_app(cfg, *paths)
     ([Util.home(cfg.name.user), cfg.global.dirs.apps, cfg.name.app] +
-      paths).join '/'
+      paths)*'/'
   end
 
   # --
@@ -120,11 +120,6 @@ module Napp; module Cfg
   # type.yml path
   def self.file_app_cfg_type(cfg)
     "#{dir_app_cfg cfg}/type.yml"
-  end
-
-  # nginx.conf path
-  def self.file_app_cfg_nginx(cfg)
-    "#{dir_app_cfg cfg}/nginx.conf"
   end
 
   # napp.log path

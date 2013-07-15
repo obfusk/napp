@@ -2,7 +2,7 @@
 #
 # File        : napp/cmd.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-13
+# Date        : 2013-07-14
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -10,6 +10,7 @@
 # --                                                            ; }}}1
 
 require 'napp/util'
+require 'napp/version'
 
 module Napp
 
@@ -19,17 +20,18 @@ module Napp
 
   module Cmd
 
-    USAGE = 'napp { <command> [<arg(s)>] | help [<command>] }'
+    USAGE = \
+      'napp { <command> [<arg(s)>] | help [<command>] | version }'
 
     # --
 
-    # run/dispatch; *Error -> die!
+    # run/dispatch; *Error -> udie!
     def self.run(cfg, *args)                                    # {{{1
       begin
         run_cmd cfg, *args
       rescue Util::ArgError, Util::ValidationError,
              OptionParser::ParseError => e
-        Util.fail! USAGE, e.message
+        Util.udie! USAGE, e.message
       end
     end                                                         # }}}1
 
@@ -46,6 +48,8 @@ module Napp
     def self.run_cmd(cfg, cmd = nil, *args)                     # {{{1
       if !cmd
         puts "Usage: #{USAGE}"
+      elsif cmd == 'version'
+        puts "napp v#{Napp::VERSION}"
       elsif cmd == 'help'
         run_help cfg, *args
       elsif c = which[cmd]
