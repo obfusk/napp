@@ -26,13 +26,13 @@ module Napp; module Cmds; module New
   # --
 
   # parse opts, validate; MODIFIES cfg
-  def self.prepare(cfg, args_)                                  # {{{1
+  def self.prepare!(cfg, args_)                                 # {{{1
     name_, type, repo, *args = Util.args 'new', args_, 3, nil
     Valid.type! type; Valid.repo! repo
     name  = Cfg.app_name name_
     t     = Type.get type
-    cmd   = CmdCfg.new help: false
-    app   = Cfg::App.new type: type, repo: repo,
+    cmd   = CmdCfg.mnew help: false
+    app   = Cfg::App.mnew type: type, repo: repo,
               vcs: cfg.global.defaults['app']['vcs'],
               branch: cfg.global.defaults['app']['branch']
     extra = Cfg::Extra.new type: type, type_mod: t
@@ -42,12 +42,15 @@ module Napp; module Cmds; module New
     as.empty? or raise Util::ArgError, 'too many arguments'
     Valid.vcs! cfg.app.vcs; Valid.branch! cfg.app.branch
     cfg.extra.vcs_mod = VCS.get cfg.app.vcs
-    t.validate! cfg
+    t.prepare! cfg
   end                                                           # }}}1
 
   # create new app: clone + cfg
   def self.run(cfg, *args_)                                     # {{{1
-    prepare cfg, args_; name = cfg.name.join; app = cfg.app
+    prepare! cfg, args_; name = cfg.name.join; app = cfg.app
+    # TODO {
+    if ENV['DEBUG_PRY'] == 'yes' then require 'pry'; binding.pry end
+    # } TODO
     Log.olog cfg, "creating `#{name}' ..."
     Util.odie cfg, "app `#{name}' already exists" \
       if Util.exists? Cfg.dir_app(cfg)
@@ -65,7 +68,7 @@ module Napp; module Cmds; module New
     type,     = Util.args 'help new', args_, 0, 1
     Valid.type! type if type
     t         = type && Type.get(type)
-    cfg.cmd   = CmdCfg.new help: true
+    cfg.cmd   = CmdCfg.mnew help: true
     cfg.extra = Cfg::Extra.new type: type, type_mod: t
     "Usage: #{ USAGE }\n\n" +
     opt_parser(cfg).help + "\n" +

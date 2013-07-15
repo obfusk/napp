@@ -111,9 +111,9 @@ module Napp; module Cfg
   end
 
   # global nginx config dir path
-  def self.dir_nginx(cfg)
-    p = cfg.global.dirs.nginx
-    Pathname.new(p).absolute? ? p : "#{cfg.nappcfg}/#{p}"
+  def self.dir_nginx(cfg, *paths)
+    p = cfg.global.dirs.nginx; abs = Pathname.new(p).absolute?
+    ((abs ? [p] : [cfg.nappcfg, p]) + paths)*'/'
   end
 
   # --
@@ -154,12 +154,12 @@ module Napp; module Cfg
                   .map { |x| [x, d['napp']['dirs'][x.to_s]] } ]
     app   = Hash[ AppDirs.members
                   .map { |x| [x, d['napp']['dirs']['app'][x.to_s]] } ]
-    dirs[:app]      = AppDirs.new app
-    napp[:dirs]     = Dirs.new dirs
+    dirs[:app]      = AppDirs.mnew app
+    napp[:dirs]     = Dirs.mnew dirs
     napp[:commands] = d['commands']
     napp[:defaults] = d['defaults']
     napp[:logfiles] = []
-    Global.new napp
+    Global.mnew napp
   end                                                           # }}}1
 
   # load Global from napp.yml
@@ -171,7 +171,7 @@ module Napp; module Cfg
 
   # load App from YAML string
   def self.load_app(cfg, str)
-    App.new YAML.load str
+    App.mnew YAML.load str
   end
 
   # load App from YAML app cfg file
@@ -193,7 +193,7 @@ module Napp; module Cfg
 
   # load type from YAML string
   def self.load_type(cfg, str)
-    cfg.extra.type_mod::TypeCfg.new YAML.load str
+    cfg.extra.type_mod::TypeCfg.mnew YAML.load str
   end
 
   # load type from app cfg file
@@ -215,7 +215,7 @@ module Napp; module Cfg
 
   # App -> Extra
   def self.app_to_extra(app)
-    Cfg::Extra.new type: app.type, type_mod: Type.get(app.type),
+    Cfg::Extra.mnew type: app.type, type_mod: Type.get(app.type),
       vcs_mod: VCS.get(app.vcs)
   end
 

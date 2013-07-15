@@ -88,12 +88,25 @@ module Napp
 
     # --
 
+    # hash to struct
+    def self.a_struct(h = {})
+      Struct.new(*h.keys).new(*h.values)
+    end
+
     # new struct w/ fields and optional block to be class eval'd
     def self.struct(*fields, &b)                                # {{{1
       Class.new(Struct.new(*fields.map(&:to_sym))) do
         # init w/ hash
         def initialize(h = {})
           h.each { |k,v| self[k] = v }
+        end
+        # mandatory new
+        def self.mnew(h = {})
+          x = self.new h
+          x.members.each do |f|
+            x[f].nil? and raise ValidationError, "empty field: #{f}"
+          end
+          x
         end
         unless method_defined? :to_h
           # convert to hash (ruby 2 has this already)
@@ -108,11 +121,6 @@ module Napp
         self.class_eval &b if b
       end
     end                                                         # }}}1
-
-    # hash to struct
-    def self.a_struct(h = {})
-      Struct.new(*h.keys).new(*h.values)
-    end
 
     # --
 

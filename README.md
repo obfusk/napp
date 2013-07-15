@@ -2,7 +2,7 @@
 
     File        : README.md
     Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-    Date        : 2013-07-14
+    Date        : 2013-07-15
 
     Copyright   : Copyright (C) 2013  Felix C. Stegerman
     Version     : v0.2.0.dev
@@ -25,6 +25,7 @@
   * obfuskd/napp
   * errors to STDERR?
   * set version in README + version.rb
+  * remove `DEBUG_PRY`
 
 ## Description
 []: {{{1

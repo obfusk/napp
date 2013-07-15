@@ -1,5 +1,5 @@
-napp:
-  dirs:
+napp:                                                           # {{{1
+  dirs:                                                         # {{{2
     # subdirectory of user(s) home directory in which apps reside
     apps: apps
 
@@ -15,6 +15,7 @@ napp:
       cfg: cfg
       log: log
       run: run
+                                                                # }}}2
 
   # main user
   user: napp
@@ -23,27 +24,30 @@ napp:
   user_prefix: napp-
 
   # other users (w/o prefix)
-  users:
-    - foo
-    - bar
-    - baz
+  users: []
+  # - foo
+  # - bar
+  # - baz
 
   # use sudo w/ napp-log to append to log file
   log_w_sudo: true
+                                                                # }}}1
 
-defaults:
+defaults:                                                       # {{{1
   app:
     vcs: git
     branch: master
   nginx:
-    max_body_size:
-    proxy_buffering_off: false
+    validate_server_name: true
+    max_body_size:      # nginx default
+    proxy_buffering:    # nginx default
     ssl: false
   ruby:
     logdir: log
     public: public
+                                                                # }}}1
 
-commands:
+commands:                                                       # {{{1
   # run/bootstrap/update command aliases
   aliases:
     BUNDLE:       bundle install
@@ -53,3 +57,8 @@ commands:
     RACKUP:       SIGINT bundle exec rackup -E production ${LISTEN}
     RAILS_BOOT:   napp-helper-bootstrap-rails
     RAILS_UPD:    napp-helper-update-rails
+  mongo:
+  postgres:
+                                                                # }}}1
+
+# vim: set tw=70 sw=2 sts=2 et fdm=marker :

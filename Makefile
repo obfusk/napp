@@ -48,7 +48,7 @@ install-shallow:
 	  PREFIX_DOC=$(PREFIX)/doc PREFIX_RM=$(PREFIX)
 
 clean:
-	rm -fr *.gem *.tar _archive _tmp
+	rm -fr *.gem *.tar _archive _tmp examples/nginx.d
 
 archive: all
 	./_scripts/archive

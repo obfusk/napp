@@ -17,10 +17,8 @@ module Napp; module Types; module Ruby
 
   DEFAULTS = {
     type: 'ruby', listen: nil, port: nil, run: nil, bootstrap: nil,
-    update: nil, logdir: nil, public: nil, nginx_server: nil,
-    nginx_ssl: nil, nginx_default_server: nil,
-    nginx_max_body_size: nil, nginx_proxy_buffering_off: nil
-  }
+    update: nil, logdir: nil, public: nil
+  } .merge Nginx::DEFAULTS
 
   TypeCfg = Util.struct *DEFAULTS.keys
 
@@ -61,17 +59,18 @@ module Napp; module Types; module Ruby
     Nginx.options(o, cfg)
   end                                                           # }}}1
 
-  # validate type cfg; sets defaults; MODIFIES cfg
-  def self.validate!(cfg)                                       # {{{1
-    t = cfg.type; t.bootstrap = t.update unless t.bootstrap
+  # validate type cfg; set defaults; MODIFIES cfg
+  def self.prepare!(cfg)                                        # {{{1
+    # NB: nothing to validate for commands except presence
+    t           = cfg.type
+    t.bootstrap = t.update unless t.bootstrap
     Util.invalid! 'invalid: no socket or port' unless t.listen
     Valid.port! t.port if t.listen == :port
-    # NB: nothing to validate for commands except presence
     Util.invalid! 'no run command' unless t.run
     Util.invalid! 'no update command' unless t.update
     Valid.path! 'logdir', t.logdir if t.logdir
     Valid.path! 'public', t.public if t.public
-    Nginx.validate! cfg
+    Nginx.prepare! cfg
   end                                                           # }}}1
 
   # --
