@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e
+[ "$VERBOSE" == yes ] && set -x
+dir="$PREFIX_LIB" bin="$PREFIX_BIN" doc="$PREFIX_DOC"
+
+# usage: relpath <to> <from>
+relpath () { python -c \
+  'import os.path, sys; print os.path.relpath(*sys.argv[1:])' "$@"; }
+
+bin_to_dir="$( relpath "$dir" "$bin" )"
+
+mkdir -p "$dir"/bin "$dir"/lib "$doc" "$doc"/examples \
+  "$PREFIX_RM" "$bin"
+
+for file in $LIBS; do
+  d="$dir/$( dirname "$file" )"   # dirname includes lib/
+  mkdir -p "$d"
+  cp -vt "$d" "$file"
+done
+
+cp -vt "$dir"/bin       $BINS
+cp -vt "$doc"           $DOCS
+cp -vt "$doc"/examples  $EXAMPLES
+cp -vt "$PREFIX_RM"     README.md
+
+for file in $BINS; do
+  f="$( basename "$file" )" l="$bin/$f"
+  t="$bin_to_dir/bin/$f"
+  [ -L "$l" -o ! -e "$l" ] && ln -sfvt "$bin" "$t"
+done
+
+true # b/c for loop + &&

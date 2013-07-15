@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+[ "$VERBOSE" == yes ] && set -x
+export -n PREFIX PREFIX_BIN PREFIX_LIB PREFIX_DOC PREFIX_RM     # !!!
+dir=_archive/napp-"$VERSION"
+
+rm -fr "$dir"
+make install-shallow PREFIX="$dir"
+tar cf napp-"$VERSION".tar -C _archive napp-"$VERSION"
