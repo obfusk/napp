@@ -2,7 +2,7 @@
 #
 # File        : napp/valid.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-15
+# Date        : 2013-07-16
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -15,10 +15,9 @@ module Napp; module Valid
 
   # NB: keep it simple: some false positives, nothing dangerous
 
-  NUM     = %r{[0-9]+}
-  WORD    = %r{[a-zA-Z0-9_-]+}
-  PATH    = %r{(#{WORD}/)*#{WORD}}
-  SERVER  = %r{[a-z0-9.*-]+|_}
+  WORD    = %r{[a-zA-Z0-9_-]+}                                  # TODO
+  PATH    = %r{(#{WORD}/)*#{WORD}}                              # TODO
+  SERVER  = %r{[a-z0-9.*-]+|_}                                  # TODO
   URL     = %r{[a-zA-Z0-9@.:/_-]+}                              # TODO
 
   # --
@@ -37,10 +36,6 @@ module Napp; module Valid
 
   def self.path!(name, path)
     Util.validate! path, PATH, name
-  end
-
-  def self.port!(port)
-    Util.validate! port, NUM, 'port'
   end
 
   def self.repo!(repo)

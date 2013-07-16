@@ -8,7 +8,4 @@ require 'napp/cfg'
 require 'napp/cmd'
 require 'napp/util'
 
-cfg         = Napp::Cfg::All.new nappcfg: Napp::Cfg.nappcfg
-cfg.global  = Napp::Cfg.read_global cfg
-
-Napp::Cmd.run cfg, *ARGV
+Napp::Cmd.run Napp::Cfg.config, *ARGV

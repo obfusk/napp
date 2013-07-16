@@ -22,7 +22,8 @@ module Napp; module Cfg
 
   # --
 
-  All     = Util.struct *%w{ nappcfg global cmd name app type extra }
+  All     = Util.struct *%w{ nappcfg global name app type extra
+                             other }
   Global  = Util.struct *%w{ dirs user user_prefix users log_w_sudo
                              commands defaults logfiles }
   App     = Util.struct *%w{ type repo vcs branch }
@@ -42,6 +43,17 @@ module Napp; module Cfg
       "#{user.downcase}_S_#{app.downcase}".gsub('-', '_D_')
     end
   end                                                           # }}}1
+
+  # --
+
+  # create Cfg::All; sets nappcfg, global, other if not specified
+  def self.config(h = {})
+    cfg = All.new h
+    cfg.nappcfg ||= nappcfg
+    cfg.global  ||= read_global cfg
+    cfg.other   ||= {}
+    cfg
+  end
 
   # --
 

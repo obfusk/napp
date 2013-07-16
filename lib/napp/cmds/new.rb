@@ -2,7 +2,7 @@
 #
 # File        : napp/cmds/new.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-15
+# Date        : 2013-07-16
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -21,8 +21,6 @@ module Napp; module Cmds; module New
   USAGE   = 'napp new <name> <type> <repo> [<opt(s)>]'
   HELP    = 'napp help new [<type>]'
 
-  CmdCfg  = Util.struct *%w{ help }
-
   # --
 
   # parse opts, validate; MODIFIES cfg
@@ -31,12 +29,12 @@ module Napp; module Cmds; module New
     Valid.type! type; Valid.repo! repo
     name  = Cfg.app_name name_
     t     = Type.get type
-    cmd   = CmdCfg.mnew help: false
     app   = Cfg::App.mnew type: type, repo: repo,
               vcs: cfg.global.defaults['app']['vcs'],
               branch: cfg.global.defaults['app']['branch']
     extra = Cfg::Extra.new type: type, type_mod: t
-    cfg.cmd = cmd; cfg.name = name; cfg.app = app; cfg.extra = extra
+    cfg.name = name; cfg.app = app; cfg.extra = extra
+    cfg.other[:cmd_help] = false
     op    = opt_parser cfg
     as    = Util.parse_opts op, args
     as.empty? or raise Util::ArgError, 'too many arguments'
@@ -68,8 +66,8 @@ module Napp; module Cmds; module New
     type,     = Util.args 'help new', args_, 0, 1
     Valid.type! type if type
     t         = type && Type.get(type)
-    cfg.cmd   = CmdCfg.mnew help: true
     cfg.extra = Cfg::Extra.new type: type, type_mod: t
+    cfg.other[:cmd_help] = true
     "Usage: #{ USAGE }\n\n" +
     opt_parser(cfg).help + "\n" +
     "Types: #{ Type.which.keys.sort*', ' }\n" +

@@ -2,7 +2,7 @@
 #
 # File        : napp/types/ruby.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-15
+# Date        : 2013-07-16
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -26,12 +26,12 @@ module Napp; module Types; module Ruby
 
   # extends Cmd::New option parser; MODIFIES cfg
   def self.options(o, cfg)                                      # {{{1
-    cfg.type  = TypeCfg.new DEFAULTS unless cfg.cmd.help
+    cfg.type  = TypeCfg.new DEFAULTS unless cfg.other[:cmd_help]
     d         = cfg.global.defaults['ruby']
     o.on('--socket', 'Listen on socket') do |x|
       cfg.type.listen = :socket
     end
-    o.on('--port PORT', 'Listen on port') do |x|
+    o.on('--port PORT', Integer, 'Listen on port') do |x|
       cfg.type.listen = :port
       cfg.type.port = x
     end
@@ -65,7 +65,6 @@ module Napp; module Types; module Ruby
     t           = cfg.type
     t.bootstrap = t.update unless t.bootstrap
     Util.invalid! 'invalid: no socket or port' unless t.listen
-    Valid.port! t.port if t.listen == :port
     Util.invalid! 'no run command' unless t.run
     Util.invalid! 'no update command' unless t.update
     Valid.path! 'logdir', t.logdir if t.logdir

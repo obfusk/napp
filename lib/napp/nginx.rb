@@ -2,7 +2,7 @@
 #
 # File        : napp/nginx.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-15
+# Date        : 2013-07-16
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -15,7 +15,7 @@ require 'napp/util'
 module Napp; module Nginx
 
   DEFAULTS = {
-    nginx_server: nil, nginx_validate_server: nil, nginx_ssl: nil,
+    nginx_server: nil, nginx_ssl: nil,
     nginx_default_server: nil, nginx_max_body_size: nil,
     nginx_proxy_buffering: nil
   }
@@ -36,7 +36,7 @@ module Napp; module Nginx
     o.on('--[no-]validate-server',
          "Validate server_name as ^#{Valid::SERVER.source}$;",
          "default is #{sr}") do |x|
-      cfg.type.nginx_validate_server = x
+      cfg.other[:nginx_validate_server] = x
     end
     o.on('--[no-]ssl', "Nginx ssl; default is #{d['ssl']}") do |x|
       cfg.type.nginx_ssl = x
@@ -62,10 +62,11 @@ module Napp; module Nginx
     t.nginx_max_body_size ||= d['max_body_size']
     t.nginx_proxy_buffering = d['proxy_buffering'] \
       if t.nginx_proxy_buffering.nil?
-    t.nginx_validate_server = d['validate_server_name'] \
-      if t.nginx_validate_server.nil?
+    cfg.other[:nginx_validate_server] = d['validate_server_name'] \
+      if cfg.other[:nginx_validate_server].nil?
     if t.nginx_server
-      Valid.server! t.nginx_server if t.nginx_validate_server
+      Valid.server! t.nginx_server \
+        if cfg.other[:nginx_validate_server]
       Valid.max_body_size! t.nginx_max_body_size \
         if t.nginx_max_body_size
     else
