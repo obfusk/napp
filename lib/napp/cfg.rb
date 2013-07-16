@@ -2,7 +2,7 @@
 #
 # File        : napp/cfg.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-15
+# Date        : 2013-07-16
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -82,18 +82,29 @@ module Napp; module Cfg
 
   # --
 
+  # run block in app's app dir
+  def self.in_app_app(cfg, &b)
+    Dir.chdir dir_app_app(cfg), &b
+  end
+
+  # --
+
+  # $APP/$app
   def self.dir_app_app(cfg, *paths)
     dir_app cfg, cfg.global.dirs.app.app, *paths
   end
 
+  # $APP/$cfg
   def self.dir_app_cfg(cfg, *paths)
     dir_app cfg, cfg.global.dirs.app.cfg, *paths
   end
 
+  # $APP/$log
   def self.dir_app_log(cfg, *paths)
     dir_app cfg, cfg.global.dirs.app.log, *paths
   end
 
+  # $APP/$run
   def self.dir_app_run(cfg, *paths)
     dir_app cfg, cfg.global.dirs.app.run, *paths
   end

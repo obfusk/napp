@@ -2,7 +2,7 @@
 #
 # File        : napp/daemon.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-15
+# Date        : 2013-07-16
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -32,11 +32,6 @@ module Napp; module Daemon
   end
 
   # --
-
-  # run block in app's app dir
-  def self.in_app_app(cfg, &b)
-    Dir.chdir Cfg.dir_app_app(cfg), &b
-  end
 
   # wait n secs; shows message + dots + OK; dies if process is dead
   def self.wait!(cfg, pid, n)                                   # {{{1

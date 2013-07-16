@@ -2,7 +2,7 @@
 #
 # File        : napp/util.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-15
+# Date        : 2013-07-16
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -86,9 +86,9 @@ module Napp
       x.to_s.match /^(#{rx})$/ or invalid! "invalid #{name}"
     end
 
-    # @raise ValidationError if pid is not an integer
-    def self.validate_pid!(pid)
-      pid.is_a? Integer or raise ValidationError, 'invalid PID'
+    # @raise ArgumentError if pid is not an integer
+    def self.ispid!(pid)
+      pid.is_a? Integer or raise ArgumentError, 'invalid PID'
     end
 
     # --
@@ -241,7 +241,7 @@ module Napp
 
     # get process age information from ps
     def self.process_age(pid)
-      %x[ ps -p #{pid} -o etime= ].gsub(/\s/, '')
+      ispid! pid; %x[ ps -p #{pid} -o etime= ].gsub(/\s/, '')
     end
 
     # prompt for line; optionally hide input
