@@ -59,6 +59,11 @@ module Napp
       raise ValidationError, msg
     end
 
+    # prepend nohup to args
+    def self.nohup(*args)
+      ['nohup'] + args
+    end
+
     # parse options, return remaining args
     def self.parse_opts(op, args)
       as = args.dup; op.parse! as; as
@@ -259,32 +264,44 @@ module Napp
 
     # --
 
-    # exec command
+    # helper for exe/spw/sys
+    def self._spw_args(cmd, *args)                              # {{{1
+      c = [cmd, cmd]
+      if (l = args.last.dup).is_a?(Hash) && e = l.delete(:env)
+        [e, c] + args[0..-2] + [l]
+      else
+        [c] + args
+      end
+    end                                                         # }}}1
+
+    # exec command; see spw
     # @raise SysError on ENOENT
     def self.exe(cmd, *args)                                    # {{{1
       begin
-        exec [cmd, cmd], *args
+        exec *_spw_args(*args)
       rescue Errno::ENOENT => e
         raise SysError,
           "failed to exec command #{ ([cmd] + args) }: #{e.message}"
       end
     end                                                         # }}}1
 
-    # spawn command
+    # spawn command; options can be passed as last arg like w/
+    # Kernel.spawn, but instead of env as optional first arg, options
+    # takes an :env key as well; also, no shell is ever used
     # @raise SysError on ENOENT
     def self.spw(cmd, *args)                                    # {{{1
       begin
-        spawn [cmd, cmd], *args
+        spawn *_spw_args(*args)
       rescue Errno::ENOENT => e
         raise SysError,
           "failed to spawn command #{ ([cmd] + args) }: #{e.message}"
       end
     end                                                         # }}}1
 
-    # run command
+    # run command; see spw
     # @raise SysError on failure
     def self.sys(cmd, *args)
-      system [cmd, cmd], *args or raise SysError,
+      system *_spw_args(*args) or raise SysError,
         "failed to run command #{ ([cmd] + args) } (#$?)"
     end
 
