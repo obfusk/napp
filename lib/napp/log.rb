@@ -2,7 +2,7 @@
 #
 # File        : napp/log.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-13
+# Date        : 2013-07-16
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -18,9 +18,7 @@ module Napp; module Log
   def self.olog(cfg, *msgs)                                     # {{{1
     hdr = "[#{Util.now}][napp #{cfg.name.join}]"
     msgs.each do |m|
-      cfg.global.logfiles.each do |l|
-        File.open(l, 'a') { |f| f.puts "#{hdr} #{m}" }
-      end
+      cfg.global.logfiles.each { |l| Util.append l, "#{hdr} #{m}" }
       puts "-- [DEBUG] #{hdr} #{m}"                             # TODO
     end
     nil

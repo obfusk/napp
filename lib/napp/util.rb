@@ -223,6 +223,11 @@ module Napp
     rescue Errno::ESRCH; false
     end
 
+    # append to file
+    def self.append(file, *lines)
+      File.open(file, 'a') { |f| puts lines }
+    end
+
     # does file/dir or symlink exists?
     def self.exists?(path)
       File.exists?(path) || File.symlink?(path)
