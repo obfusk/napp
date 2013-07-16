@@ -15,6 +15,14 @@ require 'napp/util'
 
 module Napp; module Daemon
 
+  # def self.start
+  # end
+
+  # def self.stop
+  # end
+
+  # --
+
   # rx = /^(SIG[A-Z]+)\s+/
   # x.match(rx) ? x.sub(rx, '') : x
 

@@ -59,11 +59,6 @@ module Napp
       raise ValidationError, msg
     end
 
-    # prepend nohup to args
-    def self.nohup(*args)
-      ['nohup'] + args
-    end
-
     # parse options, return remaining args
     def self.parse_opts(op, args)
       as = args.dup; op.parse! as; as
@@ -260,6 +255,30 @@ module Napp
       line = hide ? STDIN.noecho { |i| i.gets } .tap { puts } :
                     STDIN.gets
       line && line.chomp
+    end
+
+    # --
+
+    # parses optional SIG* prefix in command string
+    # (e.g. 'SIGINT foo bar ...'); returns [command, signal];
+    # if there is no prefix, signal is SIGTERM
+    def self.cmd_killsig(cmd)                                   # {{{1
+      r = /^(SIG[A-Z0-9]+)\s+/
+      if m = cmd.match(r)
+        [cmd.sub(r, ''), m[1]]
+      else
+        [cmd, 'SIGTERM']
+      end
+    end                                                         # }}}1
+
+    # replaces ${VAR}s in command string using vars hash
+    def self.cmd_vars(cmd, vars)
+      cmd.gsub(/ \$ \{ ([A-Z_]+) \} /x) { |m| vars[$1] }
+    end
+
+    # prepend nohup to args
+    def self.nohup(*args)
+      ['nohup'] + args
     end
 
     # --
