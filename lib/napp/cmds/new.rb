@@ -25,7 +25,7 @@ module Napp; module Cmds; module New
 
   # parse opts, validate; MODIFIES cfg
   def self.prepare!(cfg, args_)                                 # {{{1
-    name_, type, repo, *args = Util.args 'new', args_, 3, nil
+    name_, type, repo, *args = OU::Valid.args 'new', args_, 3, nil
     Valid.type! type; Valid.repo! repo
     name  = Cfg.app_name name_
     t     = Type.get type
@@ -36,8 +36,8 @@ module Napp; module Cmds; module New
     cfg.name = name; cfg.app = app; cfg.extra = extra
     cfg.other[:cmd_help] = false
     op    = opt_parser cfg
-    as    = Util.parse_opts op, args
-    as.empty? or raise Util::ArgError, 'too many arguments'
+    as    = OU::Valid.parse_opts op, args
+    as.empty? or raise OU::Valid::ArgumentError, 'too many arguments'
     Valid.vcs! cfg.app.vcs; Valid.branch! cfg.app.branch
     cfg.extra.vcs_mod = VCS.get cfg.app.vcs
     t.prepare! cfg
@@ -50,20 +50,20 @@ module Napp; module Cmds; module New
     if ENV['DEBUG_PRY'] == 'yes' then require 'pry'; binding.pry end
     # } TODO
     Log.olog cfg, "creating `#{name}' ..."
-    Util.odie cfg, "app `#{name}' already exists" \
-      if Util.exists? Cfg.dir_app(cfg)
-    Util.onow 'Adding new app', name
-    Util.mkdir_p Cfg.dirs_app(cfg)
+    OU.odie! "app `#{name}' already exists", log: cfg.logger \
+      if OU::FS.exists? Cfg.dir_app(cfg)
+    OU.onow 'Adding new app', name
+    OU.omkdir_p Cfg.dirs_app(cfg)
     cfg.extra.vcs_mod.clone app.repo, Cfg.dir_app_app(cfg), app.branch
-    Util.onow 'Saving', *%w{ app.yml type.yml }
+    OU.onow 'Saving', *%w{ app.yml type.yml }
     Cfg.save_app cfg; Cfg.save_type cfg
-    Util.onow 'Done.'
+    OU.onow 'Done.'
     Log.olog cfg, "`#{name}' created."
   end                                                           # }}}1
 
   # help message; MODIFIES cfg
   def self.help(cfg, *args_)                                    # {{{1
-    type,     = Util.args 'help new', args_, 0, 1
+    type,     = OU::Valid.args 'help new', args_, 0, 1
     Valid.type! type if type
     t         = type && Type.get(type)
     cfg.extra = Cfg::Extra.new type: type, type_mod: t

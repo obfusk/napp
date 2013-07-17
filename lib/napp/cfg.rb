@@ -22,18 +22,18 @@ module Napp; module Cfg
 
   # --
 
-  All     = Util.struct *%w{ nappcfg global logger other
-                             name app type extra }
-  Global  = Util.struct *%w{ dirs user users log_w_sudo commands
-                             defaults logfiles }
-  App     = Util.struct *%w{ type repo vcs branch }
-  Extra   = Util.struct *%w{ type type_mod vcs_mod }
-  Dirs    = Util.struct *%w{ apps log nginx app }
-  AppDirs = Util.struct *%w{ app cfg log run }
+  All     = OU.struct *%w{ nappcfg global logger other
+                           name app type extra }
+  Global  = OU.struct *%w{ dirs user users log_w_sudo commands
+                           defaults logfiles }
+  App     = OU.struct *%w{ type repo vcs branch }
+  Extra   = OU.struct *%w{ type type_mod vcs_mod }
+  Dirs    = OU.struct *%w{ apps log nginx app }
+  AppDirs = OU.struct *%w{ app cfg log run }
 
   # --
 
-  Name = Util.struct *%w{ user app } do                         # {{{1
+  Name = OU.struct *%w{ user app } do                           # {{{1
     # join: user+sep+app
     def join(sep = '/')
       "#{user}#{sep}#{app}"
@@ -69,11 +69,11 @@ module Napp; module Cfg
   # @raise ValidationError if not word or word1/word2
   def self.app_name(name)                                       # {{{1
     x = if name.match %r{^(#{Valid::WORD})$}
-      { user: Util.user, app: name }
+      { user: OU::OS.user, app: name }
     elsif name.match %r{^(#{Valid::WORD})/(#{Valid::WORD})$}
       { user: $1, app: $2 }
     else
-      Util.invalid! 'invalid name'
+      OU::Valid.invalid! 'invalid name'
     end
     Name.new x
   end                                                           # }}}1
@@ -88,8 +88,8 @@ module Napp; module Cfg
 
   # app dir
   def self.dir_app(cfg, *paths)
-    ([Util.home(cfg.name.user), cfg.global.dirs.apps, cfg.name.app] +
-      paths)*'/'
+    ([OU::OS.home(cfg.name.user), cfg.global.dirs.apps,
+      cfg.name.app] + paths)*'/'
   end
 
   # --

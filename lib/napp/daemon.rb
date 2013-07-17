@@ -31,7 +31,7 @@ module Napp; module Daemon
   # get pid; returns pid or false
   def self.get_pid(cfg)
     f = Cfg.file_app_pid(cfg)
-    Util.exists?(f) ? Integer(File.read(f)) : false
+    OU::FS.exists?(f) ? Integer(File.read(f)) : false
   end
 
   # write pid
@@ -44,14 +44,14 @@ module Napp; module Daemon
   # wait n secs; shows message + dots + OK; dies if process is dead
   def self.wait!(cfg, pid, n)                                   # {{{1
     if n > 0
-      Util.onow 'Waiting', "#{n} seconds"
+      OU.onow 'Waiting', "#{n} seconds"
       n.times { sleep 1; print '.'; STDOUT.flush }
       puts
     end
-    if Util.alive? pid
-      Util.onow 'OK'
+    if OU::Process.alive? pid
+      OU.onow 'OK'
     else
-      Util.odie cfg, 'process died'
+      OU.odie! 'process died', log: cfg.logger
     end
   end                                                           # }}}1
 
@@ -65,13 +65,13 @@ module Napp; module Daemon
     when :dead    ; [:red, sta     , false]
     else            [:grn, :running, true ]
     end
-    age = run ? Util.process_age(sta) : nil
+    age = run ? OU::Process.age(sta) : nil
     { col: col, status: wha, age: age, pid: pid, run: run }
   end                                                           # }}}1
 
   # status: :stopped, pid, or :dead
   def self.status(pid)
-    !pid ? :stopped : Util.alive?(pid) ? pid : :dead
+    !pid ? :stopped : OU::Process.alive?(pid) ? pid : :dead
   end
 
   # --
@@ -100,7 +100,7 @@ module Napp; module Daemon
 
   # show verbose info
   def self.show_info_verbose(s)
-    Util.onow 'Status', info_short(s)
+    OU.onow 'Status', info_short(s)
   end
 
   # --

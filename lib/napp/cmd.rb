@@ -17,7 +17,7 @@ module Napp
 
   module Cmds; end
 
-  Util.require_all 'napp/cmds'
+  OU.require_all 'napp/cmds'
 
   module Cmd
 
@@ -30,11 +30,11 @@ module Napp
     def self.run(cfg, *args)                                    # {{{1
       begin
         run_cmd cfg, *args
-      rescue Util::ArgError, Util::ValidationError,
+      rescue OU::Valid::ArgumentError, OU::Valid::ValidationError,
              OptionParser::ParseError => e
-        Util.udie! USAGE, e.message
-      rescue Util::SysError => e
-        Util.odie cfg, e.message
+        OU.udie! USAGE, e.message
+      rescue OU::RunError => e
+        OU.odie! e.message, log: cfg.logger
       end
     end                                                         # }}}1
 
@@ -58,7 +58,7 @@ module Napp
       elsif c = which[cmd]
         c.run cfg, *args
       else
-        raise Util::ArgError, "no such subcommand: #{cmd}"
+        raise OU::ArgumentError, "no such subcommand: #{cmd}"
       end
     end                                                         # }}}1
 
@@ -70,7 +70,7 @@ module Napp
       elsif c = which[cmd]
         puts c.help cfg, *args
       else
-        raise Util::ArgError, "no such subcommand: #{cmd}"
+        raise OU::ArgumentError, "no such subcommand: #{cmd}"
       end
     end                                                         # }}}1
 
@@ -78,7 +78,7 @@ module Napp
 
     # cmd submodules
     def self.which
-      Util.submodules Napp::Cmds
+      OU.submodules Napp::Cmds
     end
 
   end

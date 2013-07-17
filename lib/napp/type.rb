@@ -15,18 +15,19 @@ module Napp
 
   module Types; end
 
-  Util.require_all 'napp/types'
+  OU.require_all 'napp/types'
 
   module Type
 
     # get type submodule
     def self.get(type)
-      which[type] or raise Util::ArgError, "no such type: #{type}"
+      which[type] or raise OU::Valid::ArgumentError,
+        "no such type: #{type}"
     end
 
     # type submodules
     def self.which
-      Util.submodules Napp::Types
+      OU.submodules Napp::Types
     end
 
   end

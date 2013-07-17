@@ -20,7 +20,7 @@ module Napp; module Types; module Ruby
     update: nil, logdir: nil, public: nil
   } .merge Nginx::DEFAULTS
 
-  TypeCfg = Util.struct *DEFAULTS.keys
+  TypeCfg = OU.struct *DEFAULTS.keys
 
   # --
 
@@ -64,9 +64,9 @@ module Napp; module Types; module Ruby
     # NB: nothing to validate for commands except presence
     t           = cfg.type
     t.bootstrap = t.update unless t.bootstrap
-    Util.invalid! 'invalid: no socket or port' unless t.listen
-    Util.invalid! 'no run command' unless t.run
-    Util.invalid! 'no update command' unless t.update
+    OU::Valid.invalid! 'invalid: no socket or port' unless t.listen
+    OU::Valid.invalid! 'no run command' unless t.run
+    OU::Valid.invalid! 'no update command' unless t.update
     Valid.path! 'logdir', t.logdir if t.logdir
     Valid.path! 'public', t.public if t.public
     Nginx.prepare! cfg

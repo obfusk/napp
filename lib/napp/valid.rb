@@ -25,25 +25,25 @@ module Napp; module Valid
   class << self
     %w{ branch type vcs }.each do |x|
       define_method "#{x}!" do |v|
-        Util.validate! v, WORD, x
+        OU::Valid.validate! v, WORD, x
       end
     end
   end
 
   def self.max_body_size!(size)
-    Util.validate! size, /^([0-9]+m|0)$/, 'max_body_size'
+    OU::Valid.validate! size, /^([0-9]+m|0)$/, 'max_body_size'
   end
 
   def self.path!(name, path)
-    Util.validate! path, PATH, name
+    OU::Valid.validate! path, PATH, name
   end
 
   def self.repo!(repo)
-    Util.validate! repo, URL, 'repo'
+    OU::Valid.validate! repo, URL, 'repo'
   end
 
   def self.server!(server)
-    Util.validate! server, SERVER, 'server'
+    OU::Valid.validate! server, SERVER, 'server'
   end
 
 end; end

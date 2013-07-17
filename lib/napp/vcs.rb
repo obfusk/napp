@@ -15,18 +15,19 @@ module Napp
 
   module VCSs; end
 
-  Util.require_all 'napp/vcss'
+  OU.require_all 'napp/vcss'
 
   module VCS
 
     # get vcs submodule
     def self.get(vcs)
-      which[vcs] or raise Util::ArgError, "no such vcs: #{vcs}"
+      which[vcs] or raise OU::Valid::ArgumentError,
+        "no such vcs: #{vcs}"
     end
 
     # vcs submodules
     def self.which
-      Util.submodules Napp::VCSs
+      OU.submodules Napp::VCSs
     end
 
   end

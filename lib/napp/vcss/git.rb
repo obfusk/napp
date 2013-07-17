@@ -22,17 +22,23 @@ module Napp; module VCSs; module Git
 
   # clone repo to dir (and checkout branch)
   def self.clone(repo, dir, branch)
-    Util.osys *CLONE[repo, dir, branch]
+    OU.chk_exit(CLONE[repo, dir, branch]) do |a|
+      OU.ospawn_w *a
+    end
   end
 
   # pull branch in dir
   def self.pull(dir, branch)
-    Dir.chdir(dir) { Util.osys *PULL[branch] }
+    OU.chk_exit(PULL[branch]) do |a|
+      OU.ospawn_w *a, chdir: dir
+    end
   end
 
   # show log in dir, n lines, optionally verbose, newest last
   def self.log(dir, n, verbose)
-    Dir.chdir(dir) { Util.osys *LOG[n,verbose] }
+    OU.chk_exit(LOG[n,verbose]) do |a|
+      OU.ospawn_w *a, chdir: dir
+    end
   end
 
 end; end; end

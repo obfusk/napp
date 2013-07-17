@@ -9,15 +9,29 @@
 #
 # --                                                            ; }}}1
 
-# require '...'
+require 'obfusk/util/all'
 
 require 'optparse'
 require 'pathname'
 
-module Napp; module Util
+module Napp
 
-  # ->(log) { Log.olog cfg, msg }
+  OU = Obfusk::Util
 
-end; end
+  module Util
+
+    # OU::Term.colour
+    def col(*a)
+      OU::Term.colour *a
+    end
+
+    # OU::Term.colour_e
+    def cole(*a)
+      OU::Term.colour_e *a
+    end
+
+  end
+
+end
 
 # vim: set tw=70 sw=2 sts=2 et fdm=marker :

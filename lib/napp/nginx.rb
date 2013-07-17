@@ -70,12 +70,12 @@ module Napp; module Nginx
       Valid.max_body_size! t.nginx_max_body_size \
         if t.nginx_max_body_size
     else
-      Util.invalid! 'invalid: ssl w/o server' if t.nginx_ssl
-      Util.invalid! 'invalid: default_server w/o server' \
+      OU::Valid.invalid! 'invalid: ssl w/o server' if t.nginx_ssl
+      OU::Valid.invalid! 'invalid: default_server w/o server' \
         if t.nginx_default_server
-      Util.invalid! 'invalid: max_body_size w/o server' \
+      OU::Valid.invalid! 'invalid: max_body_size w/o server' \
         if t.nginx_max_body_size
-      Util.invalid! 'invalid: proxy_buffering w/o server' \
+      OU::Valid.invalid! 'invalid: proxy_buffering w/o server' \
         if t.proxy_buffering
     end
   end                                                           # }}}1
