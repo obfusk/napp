@@ -2,7 +2,7 @@
 #
 # File        : napp/util.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-16
+# Date        : 2013-07-17
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -25,6 +25,51 @@ module Napp
     class CfgError < Error; end
     class SysError < Error; end
     class ValidationError < Error; end
+
+    # --
+
+    module BetterStruct                                         # {{{1
+
+      def self.included(base)
+        base.extend ClassMethods
+      end
+
+      module ClassMethods                                       # {{{2
+
+        # new, block, freeze, return
+        def build(h = {}, &b)
+          x = new h; b[x]; x.freeze
+        end
+
+      end                                                       # }}}2
+
+      # checks for missing fields, returns self
+      # @raise CfgError if any fields are nil
+      def check!
+        members.each do |f|
+          self[f].nil? and raise CfgError, "empty field: #{f}"
+        end
+        self
+      end
+
+      # def with(h = {}, &b)
+      #   x = dup
+      #   h.each {
+      # end
+
+      unless Struct.method_defined? :to_h
+        # convert to hash (ruby 2 has this already)
+        def to_h
+          Hash[each_pair.to_a]
+        end
+      end
+
+      # convert to hash w/ string keys
+      def to_str_h
+        Hash[to_h.map { |k,v| [k.to_s,v] }]
+      end
+
+    end                                                         # }}}1
 
     # --
 
@@ -98,33 +143,42 @@ module Napp
       Struct.new(*h.keys).new(*h.values)
     end
 
-    # new struct w/ fields and optional block to be class eval'd
+    # assoc key(s) w/ value(s); array keys represent nested keys;
+    # e.g. x = {x:{y:0}} => assoc(x, [:x,:y] => 1) <=> x[:x,:y] = 1;
+    # will autovivivy missing (if false/nil) nested objects as hashes
+    def self.assoc(x, h = {})                                   # {{{1
+      h.each do |k,v|
+        if k.is_a? Array
+          case k.length
+          when 0; raise ArgumentError, 'empty array key'
+          when 1; x[k.first] = v
+          else    h, *t = k; assoc (x[h] ||= {}), t => v
+          end
+        else
+          x[k] = v
+        end
+      end
+      x
+    end                                                         # }}}1
+
+    # deep copy using Marshal
+    def self.deepdup(obj)
+      Marshal.load Marshal.dump obj
+    end
+
+    # better struct
     def self.struct(*fields, &b)                                # {{{1
       Class.new(Struct.new(*fields.map(&:to_sym))) do
+
+        include BetterStruct
+
         # init w/ hash
         def initialize(h = {})
           h.each { |k,v| self[k] = v }
         end
-        # mandatory new
-        # @raise CfgError if any fields are nil
-        def self.mnew(h = {})
-          x = self.new h
-          x.members.each do |f|
-            x[f].nil? and raise CfgError, "empty field: #{f}"
-          end
-          x
-        end
-        unless method_defined? :to_h
-          # convert to hash (ruby 2 has this already)
-          def to_h
-            Hash[each_pair.to_a]
-          end
-        end
-        # convert to hash w/ string keys
-        def to_str_h
-          Hash[to_h.map { |k,v| [k.to_s,v] }]
-        end
+
         self.class_eval &b if b
+
       end
     end                                                         # }}}1
 
