@@ -54,14 +54,15 @@ module Napp; module Cfg
 
   # create Cfg::All; sets nappcfg, global, log, other if not specified
   def self.config(h = {}, &b)                                   # {{{1
-    All.build(h) do |cfg|
+    x = All.build(h) do |cfg|
       cfg.nappcfg ||= nappcfg
       cfg.global  ||= read_global cfg
       cfg.log     ||= ->(c) { ->(*msgs) { Log.log c, *msgs } }
       cfg.other   ||= {}
       b[cfg] if b
       cfg.other.freeze
-    end .check!
+    end
+    x.other[:help] ? x : x.check!
   end                                                           # }}}1
 
   # --
@@ -225,7 +226,9 @@ module Napp; module Cfg
 
   # load type from YAML string
   def self.load_type(cfg, str)
-    cfg.extra.type_mod::TypeCfg.build(YAML.load str).check!
+    cfg.extra.type_mod::TypeCfg.build(YAML.load str) do |t|
+      t.load
+    end .check!
   end
 
   # load type from app cfg file
@@ -235,7 +238,7 @@ module Napp; module Cfg
 
   # dump type to YAML string
   def self.dump_type(cfg)
-    YAML.dump cfg.type.to_str_h
+    YAML.dump cfg.type.dump
   end
 
   # dump type to YAML app cfg file

@@ -15,23 +15,23 @@ require 'napp/util'
 module Napp; module Nginx
 
   DEFAULTS = {
-    nginx_server: nil, nginx_ssl: nil,
-    nginx_default_server: nil, nginx_max_body_size: nil,
-    nginx_proxy_buffering: nil
+    server: nil, ssl: nil, default_server: nil, max_body_size: nil,
+    proxy_buffering: nil
   }
 
-  DEF = 'nginx default'
+  NginxCfg  = OU.struct *DEFAULTS.keys
+  DEF       = 'nginx default'
 
   # --
 
   # extends Cmd::New/type option parser; MODIFIES cfg
-  def self.options(o, cfg, type)                                # {{{1
+  def self.options(o, cfg, nginx)                               # {{{1
     d   = cfg.global.defaults['nginx']
     mbs = d['max_body_size'] || DEF
     pb  = d['proxy_buffering'].nil? ? DEF : d['proxy_buffering']
     sr  = d['validate_server_name']
     o.on('--server NAME', 'Nginx server_name; optional') do |x|
-      type.nginx_server = x
+      nginx.server = x
     end
     o.on('--[no-]validate-server',
          "Validate server_name as ^#{Valid::SERVER.source}$;",
@@ -39,44 +39,46 @@ module Napp; module Nginx
       cfg.other[:nginx_validate_server] = x
     end
     o.on('--[no-]ssl', "Nginx ssl; default is #{d['ssl']}") do |x|
-      type.nginx_ssl = x
+      nginx.ssl = x
     end
     o.on('--[no-]default-server',
          'Nginx default_server; default is no') do |x|
-      type.nginx_default_server = x
+      nginx.default_server = x
     end
     o.on('--max-body-size SIZE', 'Nginx client_max_body_size;',
          "default is #{mbs}") do |x|
-      type.nginx_max_body_size = x
+      nginx.max_body_size = x
     end
     o.on('--[no-]proxy-buffering', 'Nginx proxy_buffering;',
          "default is #{pb}") do |x|
-      type.nginx_proxy_buffering = x
+      nginx.proxy_buffering = x
     end
   end                                                           # }}}1
 
-  # validate type cfg; set defaults; MODIFIES cfg
-  def self.prepare!(cfg, type)                                  # {{{1
+  # validate nginx cfg; set defaults; MODIFIES cfg
+  def self.prepare!(cfg, nginx)                                 # {{{1
     d = cfg.global.defaults['nginx']
-    type.nginx_ssl = d['ssl'] if type.nginx_ssl.nil?
-    type.nginx_max_body_size ||= d['max_body_size']
-    type.nginx_proxy_buffering = d['proxy_buffering'] \
-      if type.nginx_proxy_buffering.nil?
+    nginx.ssl = d['ssl'] if nginx.ssl.nil?
+    nginx.max_body_size ||= d['max_body_size']
+    nginx.proxy_buffering = d['proxy_buffering'] \
+      if nginx.proxy_buffering.nil?
     cfg.other[:nginx_validate_server] = d['validate_server_name'] \
       if cfg.other[:nginx_validate_server].nil?
-    if type.nginx_server
-      Valid.server! type.nginx_server \
+    if nginx.server
+      Valid.server! nginx.server \
         if cfg.other[:nginx_validate_server]
-      Valid.max_body_size! type.nginx_max_body_size \
-        if type.nginx_max_body_size
+      Valid.max_body_size! nginx.max_body_size \
+        if nginx.max_body_size
+      nginx
     else
-      OU::Valid.invalid! 'invalid: ssl w/o server' if type.nginx_ssl
+      OU::Valid.invalid! 'invalid: ssl w/o server' if nginx.ssl
       OU::Valid.invalid! 'invalid: default_server w/o server' \
-        if type.nginx_default_server
+        if nginx.default_server
       OU::Valid.invalid! 'invalid: max_body_size w/o server' \
-        if type.nginx_max_body_size
+        if nginx.max_body_size
       OU::Valid.invalid! 'invalid: proxy_buffering w/o server' \
-        if type.proxy_buffering
+        if nginx.proxy_buffering
+      nil
     end
   end                                                           # }}}1
 
@@ -144,17 +146,17 @@ module Napp; module Nginx
 
   # create config using cfg
   def self.config(cfg)                                          # {{{1
-    t       = cfg.type
+    t = cfg.type; n = cfg.type.nginx
     listen  = t.listen == :socket ?
       { socket: Cfg.file_app_sock(cfg), name: cfg.name.safe } :
       { port: t.port }
-    server  = t.nginx_server
+    server  = n.server
     logdir  = Cfg.dir_app_log cfg
     public  = t.public && Cfg.dir_app_app(cfg, t.public)
-    opts    = { public: public, ssl: t.nginx_ssl,
-                default_server: t.nginx_default_server,
-                max_body_size: t.nginx_max_body_size,
-                proxy_buffering: t.nginx_proxy_buffering }
+    opts    = { public: public, ssl: n.ssl,
+                default_server: n.default_server,
+                max_body_size: n.max_body_size,
+                proxy_buffering: n.proxy_buffering }
     config_ listen, server, logdir, opts
   end                                                           # }}}1
 

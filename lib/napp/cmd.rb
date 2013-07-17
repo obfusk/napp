@@ -46,12 +46,14 @@ module Napp
 
     # --
 
-    # dispatch to cmd submodule run
+    # dispatch to cmd submodule run; MODIFIES cfg[:help]
     # @raise ArgError on unknown command
     def self.run_cmd(cfg, cmd = nil, *args)                     # {{{1
       if !cmd
+        cfg.other[:help] = true
         puts "Usage: #{USAGE}"
       elsif cmd == 'version'
+        cfg.other[:help] = true
         puts "napp version #{Napp::VERSION}"
       elsif cmd == 'help'
         run_help cfg, *args
@@ -62,9 +64,10 @@ module Napp
       end
     end                                                         # }}}1
 
-    # dispatch to cmd submodule help
+    # dispatch to cmd submodule help; MODIFIES cfg[:help]
     # @raise ArgError on unknown command
     def self.run_help(cfg, cmd = nil, *args)                    # {{{1
+      cfg.other[:help] = true
       if !cmd
         puts help cfg
       elsif c = which[cmd]

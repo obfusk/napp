@@ -27,7 +27,7 @@ module Napp; module Cmds; module New
   def self.prepare!(cfg, args_)                                 # {{{1
     name_, type, repo, *args = OU::Valid.args 'new', args_, 3, nil
     Valid.type! type; Valid.repo! repo; t = Type.get type
-    cfg.other[:cmd_help] = false; cfg.name = Cfg.app_name name_
+    cfg.name = Cfg.app_name name_
     cfg.extra = Cfg::Extra.build(type: type, type_mod: t) do |extra|
       cfg.app = Cfg::App.build(
         type: type, repo: repo,
@@ -35,7 +35,7 @@ module Napp; module Cmds; module New
         branch: cfg.global.defaults['app']['branch']
       ) do |app|
         cfg.type = t::TypeCfg.build(t::DEFAULTS) do |type|
-          op = opt_parser cfg, app, type
+          op = opt_parser cfg, app, type, extra
           as = OU::Valid.parse_opts op, args
           as.empty? or raise OU::Valid::ArgumentError,
             'too many arguments'
@@ -58,7 +58,7 @@ module Napp; module Cmds; module New
     OU.odie! "app `#{name}' already exists", log: cfg.logger \
       if OU::FS.exists? Cfg.dir_app(cfg)
     OU.onow 'Adding new app', name
-    OU.omkdir_p Cfg.dirs_app(cfg)
+    OU::FS.omkdir_p Cfg.dirs_app(cfg)
     cfg.extra.vcs_mod.clone app.repo, Cfg.dir_app_app(cfg), app.branch
     OU.onow 'Saving', *%w{ app.yml type.yml }
     Cfg.save_app cfg; Cfg.save_type cfg
@@ -71,17 +71,16 @@ module Napp; module Cmds; module New
     type,     = OU::Valid.args 'help new', args_, 0, 1
     Valid.type! type if type
     t         = type && Type.get(type)
-    cfg.other[:cmd_help] = true
-    cfg.extra = Cfg::Extra.new type: type, type_mod: t  # incomplete
+    extra = Cfg::Extra.new type: type, type_mod: t  # incomplete
     "Usage: #{ USAGE }\n\n" +
-    opt_parser(cfg, nil, nil).help + "\n" +
+    opt_parser(cfg, nil, nil, extra).help + "\n" +
     "Types: #{ Type.which.keys.sort*', ' }\n" +
     "VCSs: #{ VCS.which.keys.sort*', ' }\n"
   end                                                           # }}}1
 
-  # option parser; extended by cfg.extra.type_mod.options;
+  # option parser; extended by extra.type_mod.options;
   # MODIFIES cfg
-  def self.opt_parser(cfg, app, type)                           # {{{1
+  def self.opt_parser(cfg, app, type, extra)                    # {{{1
     # TODO: napp modify --name= --repo= !?
     OptionParser.new 'Options:' do |o|
       o.on('--vcs VCS',
@@ -94,8 +93,8 @@ module Napp; module Cmds; module New
            "#{cfg.global.defaults['branch']}") do |x|
         app.branch = x
       end
-      if t = cfg.extra.type_mod
-        o.separator "\n#{cfg.extra.type} options:"
+      if t = extra.type_mod
+        o.separator "\n#{extra.type} options:"
         t.options o, cfg, type
       else
         o.separator "\nTo see type options, use: #{HELP}"

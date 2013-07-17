@@ -16,11 +16,23 @@ require 'napp/util'
 module Napp; module Types; module Ruby
 
   DEFAULTS = {
-    type: 'ruby', listen: nil, port: nil, run: nil, bootstrap: nil,
-    update: nil, logdir: nil, public: nil
-  } .merge Nginx::DEFAULTS
+    type: 'ruby', listen: nil, port: false, run: nil, bootstrap: nil,
+    update: nil, logdir: false, public: false, nginx: false
+  }
 
-  TypeCfg = OU.struct *DEFAULTS.keys
+  TypeCfg = OU.struct(*DEFAULTS.keys) do                        # {{{1
+    # load callback
+    def load
+      # fields can be nil
+      self.nginx = Nginx::NginxCfg.new self.nginx if self.nginx
+    end
+    # dump callback; returns hash
+    def dump
+      x = self.to_str_h
+      x['nginx'] = x['nginx'].to_str_h if x['nginx']
+      x
+    end
+  end                                                           # }}}1
 
   # --
 
@@ -54,7 +66,8 @@ module Napp; module Types; module Ruby
          "default DIR is #{d['public']}") do |x|
       type.public = x || d['public']
     end
-    Nginx.options o, cfg, type
+    type.nginx = Nginx::NginxCfg.new if type  # temporary
+    Nginx.options o, cfg, (type && type.nginx)
   end                                                           # }}}1
 
   # validate type cfg; set defaults; MODIFIES cfg
@@ -66,7 +79,9 @@ module Napp; module Types; module Ruby
     OU::Valid.invalid! 'no update command' unless type.update
     Valid.path! 'logdir', type.logdir if type.logdir
     Valid.path! 'public', type.public if type.public
-    Nginx.prepare! cfg, type
+    type.nginx = Nginx.prepare!(cfg, type.nginx)
+    type.nginx.freeze if type.nginx   # done.
+    # TODO: build/check! nginx ?!
   end                                                           # }}}1
 
   # --
