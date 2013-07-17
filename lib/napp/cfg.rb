@@ -22,8 +22,6 @@ module Napp; module Cfg
 
   # --
 
-  All     = OU.struct *%w{ nappcfg global logger other
-                           name app type extra }
   Global  = OU.struct *%w{ dirs user users log_w_sudo commands
                            defaults logfiles }
   App     = OU.struct *%w{ type repo vcs branch }
@@ -32,6 +30,14 @@ module Napp; module Cfg
   AppDirs = OU.struct *%w{ app cfg log run }
 
   # --
+
+  All = OU.struct *%w{ nappcfg global log other
+                       name app type extra } do                 # {{{1
+    # pass self to self.log
+    def logger
+      self.log[self]
+    end
+  end                                                           # }}}1
 
   Name = OU.struct *%w{ user app } do                           # {{{1
     # join: user+sep+app
@@ -46,14 +52,17 @@ module Napp; module Cfg
 
   # --
 
-  # create Cfg::All; sets nappcfg, global, other if not specified
-  def self.config(h = {})
-    cfg = All.new h
-    cfg.nappcfg ||= nappcfg
-    cfg.global  ||= read_global cfg
-    cfg.other   ||= {}
-    cfg
-  end
+  # create Cfg::All; sets nappcfg, global, log, other if not specified
+  def self.config(h = {}, &b)                                   # {{{1
+    All.build(h) do |cfg|
+      cfg.nappcfg ||= nappcfg
+      cfg.global  ||= read_global cfg
+      cfg.log     ||= ->(c) { ->(*msgs) { Log.log c, *msgs } }
+      cfg.other   ||= {}
+      b[cfg] if b
+      cfg.other.freeze
+    end .check!
+  end                                                           # }}}1
 
   # --
 
@@ -75,7 +84,7 @@ module Napp; module Cfg
     else
       OU::Valid.invalid! 'invalid name'
     end
-    Name.new x
+    Name.build(x).check!
   end                                                           # }}}1
 
   # --
@@ -177,12 +186,12 @@ module Napp; module Cfg
                   .map { |x| [x, d['napp']['dirs'][x.to_s]] } ]
     app   = Hash[ AppDirs.members
                   .map { |x| [x, d['napp']['dirs']['app'][x.to_s]] } ]
-    dirs[:app]      = AppDirs.mnew app
-    napp[:dirs]     = Dirs.mnew dirs
-    napp[:commands] = d['commands']
-    napp[:defaults] = d['defaults']
+    dirs[:app]      = AppDirs.build(app).check!
+    napp[:dirs]     = Dirs.build(dirs).check!
+    napp[:commands] = d['commands'].freeze
+    napp[:defaults] = d['defaults'].freeze
     napp[:logfiles] = []
-    Global.mnew napp
+    Global.build(napp).check!
   end                                                           # }}}1
 
   # load Global from napp.yml
@@ -194,7 +203,7 @@ module Napp; module Cfg
 
   # load App from YAML string
   def self.load_app(cfg, str)
-    App.mnew YAML.load str
+    App.build(YAML.load str).check!
   end
 
   # load App from YAML app cfg file
@@ -216,7 +225,7 @@ module Napp; module Cfg
 
   # load type from YAML string
   def self.load_type(cfg, str)
-    cfg.extra.type_mod::TypeCfg.mnew YAML.load str
+    cfg.extra.type_mod::TypeCfg.build(YAML.load str).check!
   end
 
   # load type from app cfg file
@@ -238,8 +247,8 @@ module Napp; module Cfg
 
   # App -> Extra
   def self.app_to_extra(app)
-    Cfg::Extra.mnew type: app.type, type_mod: Type.get(app.type),
-      vcs_mod: VCS.get(app.vcs)
+    Cfg::Extra.build(type: app.type, type_mod: Type.get(app.type),
+      vcs_mod: VCS.get(app.vcs)).check!
   end
 
 end; end

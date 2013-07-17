@@ -2,7 +2,7 @@
 #
 # File        : napp/log.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-16
+# Date        : 2013-07-17
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -15,7 +15,7 @@ module Napp; module Log
 
   # write message(s) to log file(s)
   # TODO: napp-log
-  def self.olog(cfg, *msgs)                                     # {{{1
+  def self.log(cfg, *msgs)                                      # {{{1
     hdr = "[#{OU::OS.now}][napp #{cfg.name.join}]"
     msgs.each do |m|
       cfg.global.logfiles.each { |l| OU::FS.append l, "#{hdr} #{m}" }

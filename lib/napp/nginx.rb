@@ -2,7 +2,7 @@
 #
 # File        : napp/nginx.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-16
+# Date        : 2013-07-17
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -25,13 +25,13 @@ module Napp; module Nginx
   # --
 
   # extends Cmd::New/type option parser; MODIFIES cfg
-  def self.options(o, cfg)                                      # {{{1
+  def self.options(o, cfg, type)                                # {{{1
     d   = cfg.global.defaults['nginx']
     mbs = d['max_body_size'] || DEF
     pb  = d['proxy_buffering'].nil? ? DEF : d['proxy_buffering']
     sr  = d['validate_server_name']
     o.on('--server NAME', 'Nginx server_name; optional') do |x|
-      cfg.type.nginx_server = x
+      type.nginx_server = x
     end
     o.on('--[no-]validate-server',
          "Validate server_name as ^#{Valid::SERVER.source}$;",
@@ -39,44 +39,44 @@ module Napp; module Nginx
       cfg.other[:nginx_validate_server] = x
     end
     o.on('--[no-]ssl', "Nginx ssl; default is #{d['ssl']}") do |x|
-      cfg.type.nginx_ssl = x
+      type.nginx_ssl = x
     end
     o.on('--[no-]default-server',
          'Nginx default_server; default is no') do |x|
-      cfg.type.nginx_default_server = x
+      type.nginx_default_server = x
     end
     o.on('--max-body-size SIZE', 'Nginx client_max_body_size;',
          "default is #{mbs}") do |x|
-      cfg.type.nginx_max_body_size = x
+      type.nginx_max_body_size = x
     end
     o.on('--[no-]proxy-buffering', 'Nginx proxy_buffering;',
          "default is #{pb}") do |x|
-      cfg.type.nginx_proxy_buffering = x
+      type.nginx_proxy_buffering = x
     end
   end                                                           # }}}1
 
   # validate type cfg; set defaults; MODIFIES cfg
-  def self.prepare!(cfg)                                        # {{{1
-    t = cfg.type; d = cfg.global.defaults['nginx']
-    t.nginx_ssl = d['ssl'] if t.nginx_ssl.nil?
-    t.nginx_max_body_size ||= d['max_body_size']
-    t.nginx_proxy_buffering = d['proxy_buffering'] \
-      if t.nginx_proxy_buffering.nil?
+  def self.prepare!(cfg, type)                                  # {{{1
+    d = cfg.global.defaults['nginx']
+    type.nginx_ssl = d['ssl'] if type.nginx_ssl.nil?
+    type.nginx_max_body_size ||= d['max_body_size']
+    type.nginx_proxy_buffering = d['proxy_buffering'] \
+      if type.nginx_proxy_buffering.nil?
     cfg.other[:nginx_validate_server] = d['validate_server_name'] \
       if cfg.other[:nginx_validate_server].nil?
-    if t.nginx_server
-      Valid.server! t.nginx_server \
+    if type.nginx_server
+      Valid.server! type.nginx_server \
         if cfg.other[:nginx_validate_server]
-      Valid.max_body_size! t.nginx_max_body_size \
-        if t.nginx_max_body_size
+      Valid.max_body_size! type.nginx_max_body_size \
+        if type.nginx_max_body_size
     else
-      OU::Valid.invalid! 'invalid: ssl w/o server' if t.nginx_ssl
+      OU::Valid.invalid! 'invalid: ssl w/o server' if type.nginx_ssl
       OU::Valid.invalid! 'invalid: default_server w/o server' \
-        if t.nginx_default_server
+        if type.nginx_default_server
       OU::Valid.invalid! 'invalid: max_body_size w/o server' \
-        if t.nginx_max_body_size
+        if type.nginx_max_body_size
       OU::Valid.invalid! 'invalid: proxy_buffering w/o server' \
-        if t.proxy_buffering
+        if type.proxy_buffering
     end
   end                                                           # }}}1
 

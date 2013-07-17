@@ -2,7 +2,7 @@
 #
 # File        : napp/types/ruby.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-16
+# Date        : 2013-07-17
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -25,51 +25,48 @@ module Napp; module Types; module Ruby
   # --
 
   # extends Cmd::New option parser; MODIFIES cfg
-  def self.options(o, cfg)                                      # {{{1
-    cfg.type  = TypeCfg.new DEFAULTS unless cfg.other[:cmd_help]
-    d         = cfg.global.defaults['ruby']
+  def self.options(o, cfg, type)                                # {{{1
+    d = cfg.global.defaults['ruby']
     o.on('--socket', 'Listen on socket') do |x|
-      cfg.type.listen = :socket
+      type.listen = :socket
     end
     o.on('--port PORT', Integer, 'Listen on port') do |x|
-      cfg.type.listen = :port
-      cfg.type.port = x
+      type.listen = :port; type.port = x
     end
     o.on('--run CMD', 'Command to run app') do |x|
-      cfg.type.run = x
+      type.run = x
     end
     o.on('--bootstrap CMD',
          'Command to bootstrap app;',
          'default is update command') do |x|
-      cfg.type.bootstrap = x
+      type.bootstrap = x
     end
     o.on('--update CMD', 'Command to update app') do |x|
-      cfg.type.update = x
+      type.update = x
     end
     o.on('--logdir [DIR]',
          'Subdir of app with *.log files; optional;',
          "default DIR is #{d['logdir']}") do |x|
-      cfg.type.logdir = x || d['logdir']
+      type.logdir = x || d['logdir']
     end
     o.on('--public [DIR]',
          'Subdir of app with public files; optional;',
          "default DIR is #{d['public']}") do |x|
-      cfg.type.public = x || d['public']
+      type.public = x || d['public']
     end
-    Nginx.options(o, cfg)
+    Nginx.options o, cfg, type
   end                                                           # }}}1
 
   # validate type cfg; set defaults; MODIFIES cfg
-  def self.prepare!(cfg)                                        # {{{1
+  def self.prepare!(cfg, type)                                  # {{{1
     # NB: nothing to validate for commands except presence
-    t           = cfg.type
-    t.bootstrap = t.update unless t.bootstrap
-    OU::Valid.invalid! 'invalid: no socket or port' unless t.listen
-    OU::Valid.invalid! 'no run command' unless t.run
-    OU::Valid.invalid! 'no update command' unless t.update
-    Valid.path! 'logdir', t.logdir if t.logdir
-    Valid.path! 'public', t.public if t.public
-    Nginx.prepare! cfg
+    type.bootstrap = type.update unless type.bootstrap
+    OU::Valid.invalid! 'invalid: no socket or port' unless type.listen
+    OU::Valid.invalid! 'no run command' unless type.run
+    OU::Valid.invalid! 'no update command' unless type.update
+    Valid.path! 'logdir', type.logdir if type.logdir
+    Valid.path! 'public', type.public if type.public
+    Nginx.prepare! cfg, type
   end                                                           # }}}1
 
   # --

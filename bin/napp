@@ -12,11 +12,11 @@ require 'napp/cmd'
 require 'napp/log'
 require 'napp/util'
 
-cfg = Napp::Cfg.config
-
-begin
-  Napp::Cmd.run cfg, *ARGV
-rescue RuntimeError => e
-  Napp::OU.odie! e.to_s, log: cfg.logger                        # TODO
-  STDERR.puts e.backtrace
+cfg = Napp::Cfg.config do
+  begin
+    Napp::Cmd.run cfg, *ARGV
+  rescue RuntimeError => e
+    Napp::OU.odie! e.to_s, log: cfg.logger                      # TODO
+    STDERR.puts e.backtrace
+  end
 end
