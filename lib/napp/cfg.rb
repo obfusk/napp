@@ -22,8 +22,8 @@ module Napp; module Cfg
 
   # --
 
-  All     = Util.struct *%w{ nappcfg global name app type extra
-                             other }
+  All     = Util.struct *%w{ nappcfg global logger other
+                             name app type extra }
   Global  = Util.struct *%w{ dirs user users log_w_sudo commands
                              defaults logfiles }
   App     = Util.struct *%w{ type repo vcs branch }

@@ -9,6 +9,14 @@ end
 
 require 'napp/cfg'
 require 'napp/cmd'
+require 'napp/log'
 require 'napp/util'
 
-Napp::Cmd.run Napp::Cfg.config, *ARGV
+cfg = Napp::Cfg.config
+
+begin
+  Napp::Cmd.run cfg, *ARGV
+rescue RuntimeError => e
+  Napp::OU.odie! e.to_s, log: cfg.logger                        # TODO
+  STDERR.puts e.backtrace
+end
