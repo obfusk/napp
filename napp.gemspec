@@ -21,5 +21,8 @@ Gem::Specification.new do |s|
   s.files       = %w{ README.md napp.gemspec }\                 # TODO
                 + Dir['lib/napp/**/*.rb']
 
+  s.add_runtime_dependency 'eft'
+  s.add_runtime_dependency 'obfusk-util'
+
   s.required_ruby_version = '>= 1.9.1'
 end

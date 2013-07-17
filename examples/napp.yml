@@ -20,10 +20,7 @@ napp:                                                           # {{{1
   # main user
   user: napp
 
-  # prefix for other users
-  user_prefix: napp-
-
-  # other users (w/o prefix)
+  # other users
   users: []
   # - foo
   # - bar

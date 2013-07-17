@@ -2,7 +2,7 @@
 #
 # File        : napp/cfg.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-16
+# Date        : 2013-07-17
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -24,8 +24,8 @@ module Napp; module Cfg
 
   All     = Util.struct *%w{ nappcfg global name app type extra
                              other }
-  Global  = Util.struct *%w{ dirs user user_prefix users log_w_sudo
-                             commands defaults logfiles }
+  Global  = Util.struct *%w{ dirs user users log_w_sudo commands
+                             defaults logfiles }
   App     = Util.struct *%w{ type repo vcs branch }
   Extra   = Util.struct *%w{ type type_mod vcs_mod }
   Dirs    = Util.struct *%w{ apps log nginx app }

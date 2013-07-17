@@ -1,9 +1,3 @@
 #!/usr/bin/env ruby
 
-unless Gem.loaded_specs.include? 'napp'
-  $:.unshift File.expand_path('../../lib', __FILE__)
-end
-
-require 'napp'
-
-puts '... TODO ...'
+puts 'TODO'; exit 1

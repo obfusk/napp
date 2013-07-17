@@ -5,4 +5,5 @@
 /*.tar
 /_archive
 /_tmp
+/deps
 /examples/nginx.d

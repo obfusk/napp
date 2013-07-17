@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 
 unless Gem.loaded_specs.include? 'napp'
-  $:.unshift File.expand_path('../../lib', __FILE__)
+  libs = [File.expand_path('../../lib', __FILE__)]
+  deps = File.expand_path('../../deps', __FILE__)
+  Dir["#{deps}/*/lib"].each { |lib| libs << lib }
+  $:.unshift *libs
 end
 
 require 'napp/cfg'
