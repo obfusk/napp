@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# --                                                            ; {{{1
+#
+# File        : napp-deamon
+# Maintainer  : Felix C. Stegerman <flx@obfusk.net>
+# Date        : 2013-07-20
+#
+# Copyright   : Copyright (C) 2013  Felix C. Stegerman
+# Licence     : GPLv2
+#
+# --
+#
+# napp-daemon - wrap process in pidfile handling
+#
+# napp-daemon runs a command, wrapping it in pidfile handling:
+#
+#   1. write 'spawning' to pidfile
+#   2. start command in background
+#   3. write "running $pid" to pidfile
+#   4. wait for process to end
+#   5. write "stopped $exitstatus" to pidfile
+#
+# If napp-daemon receives SIGTERM or SIGINT, it kills the process
+# using the specified signal and writes "terminated SIGTERM",
+# respectively "terminated SIGINT" to pidfile.  If napp-daemon exits
+# for any other reason, it writes 'exited' to pidfile.
+#
+# --                                                            ; }}}1
+
+set -e
+
+usage='napp-daemon <pidfile> <signal> <command> [ <arg(s)> ]'
+
+[ "$1" == --help ] && { echo "Usage: $usage" >&2; exit 0; }
+[ "$#" -lt 3 ]     && { echo "Usage: $usage" >&2; exit 1; }
+
+pidfile="$1" signal="$2" pid= ret= stopped=n; shift 2
+
+# --
+
+function bye () { kill -"$signal" "$pid" || true; stopped=y; exit; }
+
+function handle_TERM ()
+{ echo 'terminated SIGTERM' > "$pidfile"; bye; }
+
+function handle_INT ()
+{ echo 'terminated SIGINT' > "$pidfile"; bye; }
+
+function handle_EXIT ()
+{ [ "$stopped" != y ] && echo exited > "$pidfile"; }
+
+# --
+
+trap handle_TERM TERM; trap handle_INT INT; trap handle_EXIT EXIT
+echo spawning > "$pidfile"
+"$@" & pid=$!
+echo "running $pid" > "$pidfile"
+set +e; wait "$pid"; ret="$?"; set -e
+echo "stopped $ret" > "$pidfile"; stopped=y
+
+# vim: set tw=70 sw=2 sts=2 et fdm=marker :
