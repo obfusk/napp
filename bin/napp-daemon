@@ -4,59 +4,59 @@
 #
 # File        : napp-deamon
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-20
+# Date        : 2013-07-21
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
 #
 # --
 #
-# napp-daemon - wrap process in pidfile handling
+# napp-daemon - wrap process in statfile handling
 #
-# napp-daemon runs a command, wrapping it in pidfile handling:
+# napp-daemon runs a command, wrapping it in statfile handling:
 #
-#   1. write 'spawning' to pidfile
+#   1. write 'spawning' to statfile
 #   2. start command in background
-#   3. write "running $pid" to pidfile
+#   3. write "running $pid" to statfile
 #   4. wait for process to end
-#   5. write "stopped $exitstatus" to pidfile
+#   5. write "stopped $exitstatus" to statfile
 #
 # If napp-daemon receives SIGTERM or SIGINT, it kills the process
 # using the specified signal and writes "terminated SIGTERM",
-# respectively "terminated SIGINT" to pidfile.  If napp-daemon exits
-# for any other reason, it writes 'exited' to pidfile.
+# respectively "terminated SIGINT" to statfile.  If napp-daemon exits
+# for any other reason, it writes 'exited' to statfile.
 #
 # --                                                            ; }}}1
 
 set -e
 
-usage='napp-daemon <pidfile> <signal> <command> [ <arg(s)> ]'
+usage='napp-daemon <statfile> <signal> <command> [ <arg(s)> ]'
 
 [ "$1" == --help ] && { echo "Usage: $usage" >&2; exit 0; }
 [ "$#" -lt 3 ]     && { echo "Usage: $usage" >&2; exit 1; }
 
-pidfile="$1" signal="$2" pid= ret= stopped=n; shift 2
+statfile="$1" signal="$2" pid= ret= stopped=n; shift 2
 
 # --
 
 function bye () { kill -"$signal" "$pid" || true; stopped=y; exit; }
 
 function handle_TERM ()
-{ echo 'terminated SIGTERM' > "$pidfile"; bye; }
+{ echo 'terminated SIGTERM' > "$statfile"; bye; }
 
 function handle_INT ()
-{ echo 'terminated SIGINT' > "$pidfile"; bye; }
+{ echo 'terminated SIGINT' > "$statfile"; bye; }
 
 function handle_EXIT ()
-{ [ "$stopped" != y ] && echo exited > "$pidfile"; }
+{ [ "$stopped" != y ] && echo exited > "$statfile"; }
 
 # --
 
 trap handle_TERM TERM; trap handle_INT INT; trap handle_EXIT EXIT
-echo spawning > "$pidfile"
+echo spawning > "$statfile"
 "$@" & pid=$!
-echo "running $pid" > "$pidfile"
+echo "running $pid" > "$statfile"
 set +e; wait "$pid"; ret="$?"; set -e
-echo "stopped $ret" > "$pidfile"; stopped=y
+echo "stopped $ret" > "$statfile"; stopped=y
 
 # vim: set tw=70 sw=2 sts=2 et fdm=marker :

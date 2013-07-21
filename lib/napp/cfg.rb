@@ -2,13 +2,14 @@
 #
 # File        : napp/cfg.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-17
+# Date        : 2013-07-21
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
 #
 # --                                                            ; }}}1
 
+require 'napp/log'
 require 'napp/type'
 require 'napp/util'
 require 'napp/valid'
@@ -166,9 +167,9 @@ module Napp; module Cfg
     dir_app_log cfg, 'nap.log'
   end
 
-  # daemon.pid path
-  def self.file_app_pid(cfg)
-    dir_app_run cfg, 'daemon.pid'
+  # daemon.stat path
+  def self.file_app_stat(cfg)
+    dir_app_run cfg, 'daemon.stat'
   end
 
   # daemon.sock path

@@ -2,7 +2,7 @@
 #
 # File        : napp/cmds/new.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-17
+# Date        : 2013-07-21
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -10,7 +10,6 @@
 # --                                                            ; }}}1
 
 require 'napp/cfg'
-require 'napp/log'
 require 'napp/type'
 require 'napp/util'
 require 'napp/valid'
