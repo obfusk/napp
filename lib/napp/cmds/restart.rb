@@ -19,12 +19,12 @@ module Napp; module Cmds; module Restart
   def self.run(cfg, *args_)                                     # {{{1
     name_, = OU::Valid.args 'restart', args_, 1
     Cfg.load_app_config cfg, name_; name = cfg.name.join
-    t = cfg.extra.type_mod; alive, ok = t.running?
+    t = cfg.extra.type_mod; alive, ok = t.running? cfg
     cfg.logger["restarting `#{name}' ..."]
     cfg.logger["`#{name}' is not running"] if !alive
     OU.onow 'Restarting', name
     OU.opoo 'app is dead', log: cfg.logger if !alive && !ok
-    OU.ohai 'App is stopped' if !alive && ok
+    OU.onow 'App is stopped' if !alive && ok
     t.restart cfg if alive && ok
     OU.onow 'Done.'
     msg = alive && ok ? 'restarted' : 'not restarted'

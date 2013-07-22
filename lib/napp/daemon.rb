@@ -19,16 +19,18 @@ module Napp; module Daemon
   # --
 
   # run bootstrap command
-  def self.bootstrap(cfg, env = {})
-    cmd = sh_var_cmd alias_cmd(cfg.type.bootstrap)
+  def self.bootstrap(cfg, vars = {}, env = {})
+    cmd = sh_var_cmd alias_cmd(cfg, cfg.type.bootstrap), vars
     dir = Cfg.dir_app_app cfg
+    OU.onow 'ENV', *OU::Cmd.env_to_a(env) if !env.empty?
     OU.chk_exit(cmd) { |a| OU.ospawn_w *a, chdir: dir, env: env }
   end
 
   # run update command
-  def self.update(cfg, env = {})
-    cmd = sh_var_cmd alias_cmd(cfg.type.update)
+  def self.update(cfg, vars = {}, env = {})
+    cmd = sh_var_cmd alias_cmd(cfg, cfg.type.update), vars
     dir = Cfg.dir_app_app cfg
+    OU.onow 'ENV', *OU::Cmd.env_to_a(env) if !env.empty?
     OU.chk_exit(cmd) { |a| OU.ospawn_w *a, chdir: dir, env: env }
   end
 
@@ -61,12 +63,13 @@ module Napp; module Daemon
       OU.opoo "process is running (status=#{s}#{p})"
     else
       now   = OU::OS.now; dir = Cfg.dir_app_app cfg
-      cmd   = daemon_cmd cfg, alias_cmd(cfg.type.run), vars, nohup
+      cmd   = daemon_cmd cfg, alias_cmd(cfg, cfg.type.run),
+                vars, nohup
       olog  = Cfg.dir_app_log cfg, 'daemon-stdout.log'
       elog  = Cfg.dir_app_log cfg, 'daemon-stderr.log'
       info  = "[ #{now} -- napp -- starting #{cfg.name.join} ... ]"
       OU::FS.append olog, info; OU::FS.append elog, info
-      OU.ohai 'ENV', *OU::Cmd.env_to_a(env) if env
+      OU.onow 'ENV', *OU::Cmd.env_to_a(env) if !env.empty?
       OU.ospawn *cmd, chdir: dir, env: env, out: [olog, 'a'],
                                             err: [elog, 'a']
       wait! cfg, n

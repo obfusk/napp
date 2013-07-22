@@ -19,12 +19,12 @@ module Napp; module Cmds; module Update
   def self.run(cfg, *args_)                                     # {{{1
     name_, = OU::Valid.args 'update', args_, 1
     Cfg.load_app_config cfg, name_; name = cfg.name.join
-    t = cfg.extra.type_mod; alive, ok = t.running?
+    t = cfg.extra.type_mod; alive, ok = t.running? cfg
     cfg.logger["updating `#{name}' ..."]
     cfg.logger["`#{name}' is not running"] if !alive
     OU.onow 'Updating', name
     OU.opoo 'app is dead', log: cfg.logger if !alive && !ok
-    OU.ohai 'App is stopped' if !alive && ok
+    OU.onow 'App is stopped' if !alive && ok
     t.stop cfg if alive && ok
     cfg.extra.vcs_mod.pull Cfg.dir_app_app(cfg), cfg.app.branch
     t.update cfg
