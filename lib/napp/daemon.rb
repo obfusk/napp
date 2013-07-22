@@ -66,6 +66,7 @@ module Napp; module Daemon
       elog  = Cfg.dir_app_log cfg, 'daemon-stderr.log'
       info  = "[ #{now} -- napp -- starting #{cfg.name.join} ... ]"
       OU::FS.append olog, info; OU::FS.append elog, info
+      OU.ohai 'ENV', OU::Cmd.env_to_a(env) if env
       OU.ospawn *cmd, chdir: dir, env: env, out: [olog, 'a'],
                                             err: [elog, 'a']
       wait! cfg, n
