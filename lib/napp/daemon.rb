@@ -20,14 +20,16 @@ module Napp; module Daemon
 
   # run bootstrap command
   def self.bootstrap(cfg)
-    cmd = sh_var_cmd cfg.type.bootstrap; dir = Cfg.dir_app_app cfg
+    cmd = sh_var_cmd alias_cmd(cfg.type.bootstrap)
+    dir = Cfg.dir_app_app cfg
     OU.onow 'Bootstrapping', cmd*' '
     OU.spawn_w cmd, chdir: dir
   end
 
   # run update command
   def self.update(cfg)
-    cmd = sh_var_cmd cfg.type.update; dir = Cfg.dir_app_app cfg
+    cmd = sh_var_cmd alias_cmd(cfg.type.update)
+    dir = Cfg.dir_app_app cfg
     OU.onow 'Updating', cmd*' '
     OU.spawn_w cmd, chdir: dir
   end
@@ -60,7 +62,7 @@ module Napp; module Daemon
       OU.opoo "process is running (status=#{s}#{p})", log: cfg.logger
     else
       now   = OU::OS.now; dir = Cfg.dir_app_app cfg
-      cmd   = daemon_cmd cfg, cfg.type.run, vars, nohup
+      cmd   = daemon_cmd cfg, alias_cmd(cfg.type.run), vars, nohup
       olog  = Cfg.dir_app_log cfg, 'daemon-stdout.log'
       elog  = Cfg.dir_app_log cfg, 'daemon-stderr.log'
       info  = "[ #{now} -- napp -- starting #{cfg.name.join} ... ]"
@@ -79,13 +81,18 @@ module Napp; module Daemon
       s = sta[:status]
       OU.opoo "process is not running (status=#{s})", log: cfg.logger
     else
-      cmd = daemon_cmd cfg, OU.cfg.type.run, vars
+      cmd = daemon_cmd cfg, alias_cmd(OU.cfg.type.run), vars
       onow 'Stopping', cmd[:show]
       ::Process.kill 'SIGTERM', sta[:daemon_pid]
     end
   end                                                           # }}}1
 
   # --
+
+  # lookup alias
+  def self.alias_cmd(cfg, cmd)
+    cfg.global.commands['aliases'][cmd] || cmd
+  end
 
   # napp-daemon command
   def self.daemon_cmd(cfg, cmd, vars, nohup = true)             # {{{1
