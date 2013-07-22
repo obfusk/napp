@@ -77,16 +77,15 @@ module Napp; module Types; module Ruby
     OU::Valid.invalid! 'invalid: no socket or port' unless type.listen
     OU::Valid.invalid! 'no run command' unless type.run
     OU::Valid.invalid! 'no update command' unless type.update
-    if type.listen == :port
-      Valid.port! type.port
-      Valid.port_priviliged? type.port &&
-        OU.opoo "priviliged port: #{type.port}"
-    end
+    Valid.port! type.port if type.listen == :port
     Valid.path! 'logdir', type.logdir if type.logdir
     Valid.path! 'public', type.public if type.public
     type.nginx = Nginx.prepare!(cfg, type.nginx)
     type.nginx.freeze if type.nginx   # done.
     # TODO: build/check! nginx ?!
+    if type.listen == :port && Valid.port_priviliged?(type.port)
+      OU.opoo "port #{type.port} is priviliged"
+    end
   end                                                           # }}}1
 
   # --

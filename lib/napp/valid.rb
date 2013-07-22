@@ -35,7 +35,7 @@ module Napp; module Valid
   end
 
   def self.port!(port)
-    (1..65535).include? port || OU::Valid.invalid! 'invalid port'
+    (1..65535).include?(port) || OU::Valid.invalid!('invalid port')
   end
 
   def self.port_priviliged?(port)
