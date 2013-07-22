@@ -2,7 +2,7 @@
 #
 # File        : napp/cfg.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-21
+# Date        : 2013-07-22
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -64,6 +64,15 @@ module Napp; module Cfg
       cfg.other.freeze
     end
     x.other[:help] ? x : x.check!
+  end                                                           # }}}1
+
+  # set name; load app, type, extra; freeze; check!
+  def self.load_app_config(cfg, name)                           # {{{1
+    cfg.name  = app_name name
+    cfg.app   = read_app cfg
+    cfg.type  = read_type cfg
+    cfg.extra = app_to_extra cfg.app
+    cfg.freeze.check!
   end                                                           # }}}1
 
   # --

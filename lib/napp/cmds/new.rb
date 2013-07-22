@@ -2,7 +2,7 @@
 #
 # File        : napp/cmds/new.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-21
+# Date        : 2013-07-22
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -44,6 +44,7 @@ module Napp; module Cmds; module New
         end .check!
       end .check!
     end .check!
+    cfg.freeze.check!
     nil
   end                                                           # }}}1
 
