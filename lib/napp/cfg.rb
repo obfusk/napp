@@ -66,15 +66,14 @@ module Napp; module Cfg
     x.other[:help] ? x : x.check!
   end                                                           # }}}1
 
-  # set name; load app, type, extra; freeze; check!
+  # set name; check exists; load app, extra, type; freeze; check!
   def self.load_app_config(cfg, name)                           # {{{1
-    name      = app_name name
-    OU.odie! "app `#{name.join}' does not exist", log: cfg.logger \
-      unless OU::FS.exists? Cfg.dir_app(cfg)
-    cfg.name  = name
+    cfg.name  = app_name name
+    OU.odie! "app `#{cfg.name.join}' does not exist",
+      log: cfg.logger unless OU::FS.exists? Cfg.dir_app(cfg)
     cfg.app   = read_app cfg
-    cfg.type  = read_type cfg
     cfg.extra = app_to_extra cfg.app
+    cfg.type  = read_type cfg
     cfg.freeze.check!
   end                                                           # }}}1
 

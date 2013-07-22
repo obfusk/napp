@@ -36,16 +36,16 @@ module Napp; module Daemon
 
   # process running? returns [alive, ok]
   def self.running?(cfg, s = nil)
-    t = s || stat(cfg, :stopped); [t[:alive], t[:ok]]
+    t = s || stat(cfg, :ok); [t[:alive], t[:ok]]
   end
 
   # show app status; how: :quiet|short|verbose
   def self.status(cfg, how)                                     # {{{1
-    sta = stat cfg, :stopped
+    sta = info cfg
     case how
-    when :quiet   ; puts Daemon.info_quiet sta
-    when :short   ; puts Daemon.info_short sta
-    when :verbose ; Daemon.show_info_verbose sta
+    when :quiet   ; puts info_quiet sta
+    when :short   ; puts info_short sta
+    when :verbose ; OU.onow 'Status', info_short(sta)
     end
   end                                                           # }}}1
 
@@ -55,7 +55,7 @@ module Napp; module Daemon
   def self.start(cfg, opts = {})                                # {{{1
     nohup = opts.fetch :nohup, true ; n   = opts[:n] || 7
     vars  = opts[:vars] || {}       ; env = opts[:env] || {}
-    sta   = stat cfg, :stopped
+    sta   = stat cfg, :ok
     if sta[:alive]
       s = sta[:status]; p = sta[:pid] ? " pid=#{sta[:pid]}" : ''
       OU.opoo "process is running (status=#{s}#{p})"
@@ -74,7 +74,7 @@ module Napp; module Daemon
 
   # stop napp-daemon
   def self.stop(cfg)                                            # {{{1
-    sta = stat cfg, :stopped
+    sta = stat cfg, :ok
     if !sta[:alive]
       s = sta[:status]
       OU.opoo "process is not running (status=#{s})"
@@ -155,15 +155,16 @@ module Napp; module Daemon
     else
       case nostat
       when :die     ; raise StatError, 'No statfile'
-      when :stopped ; { alive: false, status: :stopped, exit: nil }
+      when :ok      ; { alive: false, status: :terminated,
+                        ok: true, signal: nil }
       else            nostat
       end
     end
   end                                                           # }}}1
 
   # status + col(our) + age
-  def self.info(cfg)                                            # {{{1
-    sta = stat cfg, :stopped
+  def self.info(cfg, s = nil)                                   # {{{1
+    sta = s || stat(cfg, :ok)
     age = sta[:pid] ? OU::Process.age(sta[:pid]) : nil
     col = case sta[:status]
     when :spawning    ; :yel
@@ -201,11 +202,6 @@ module Napp; module Daemon
   # short info: quiet + extra
   def self.info_short(s)
     info_coloured(s) + info_extra(s)
-  end
-
-  # show verbose info
-  def self.show_info_verbose(s)
-    OU.onow 'Status', info_short(s)
   end
 
 end; end

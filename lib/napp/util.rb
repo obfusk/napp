@@ -2,7 +2,7 @@
 #
 # File        : napp/util.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-17
+# Date        : 2013-07-22
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -21,12 +21,12 @@ module Napp
   module Util
 
     # OU::Term.colour
-    def col(*a)
+    def self.col(*a)
       OU::Term.colour *a
     end
 
     # OU::Term.colour_e
-    def cole(*a)
+    def self.cole(*a)
       OU::Term.colour_e *a
     end
 

@@ -35,7 +35,7 @@ module Napp; module Cmds; module New
       ) do |app|
         cfg.type = t::TypeCfg.build(t::DEFAULTS) do |type|
           op = opt_parser cfg, app, type, extra
-          as = OU::Valid.parse_opts op, args
+          as = op.parse_r args
           as.empty? or raise OU::Valid::ArgumentError,
             'too many arguments'
           Valid.vcs! app.vcs; Valid.branch! app.branch
@@ -79,7 +79,7 @@ module Napp; module Cmds; module New
   # MODIFIES cfg
   def self.opt_parser(cfg, app, type, extra)                    # {{{1
     # TODO: napp modify --name= --repo= !?
-    OptionParser.new 'Options:' do |o|
+    OU::Opt::Parser.new 'Options:' do |o|
       o.on('--vcs VCS',
            'Version control system; ' +
            "default is #{cfg.global.defaults['vcs']}") do |x|
