@@ -18,15 +18,60 @@ module Napp; module Daemon
 
   # --
 
-  # NB: use napp-daemon w/ file_app_stat.
+  # start process w/ napp-daemon (if not running), wait a few seconds
+  def self.start(cfg, opts = {})                                # {{{1
+    nohup = opts.fetch :nohup, true ; n   = opts[:n] || 7
+    vars  = opts[:vars] || {}       ; sta = stat cfg, :stopped
+    if sta[:alive]
+      s = sta[:status]; p = sta[:pid] ? " pid=#{sta[:pid]}" : ''
+      OU.opoo "process is running (status=#{s}#{p})", log: cfg.logger
+    else
+      now   = OU::OS.now; dir = Cfg.dir_app_app cfg
+      cmd   = daemon_cmd cfg, OU.cfg.type.run, vars
+      olog  = Cfg.dir_app_log cfg, 'daemon-stdout.log'
+      elog  = Cfg.dir_app_log cfg, 'daemon-stderr.log'
+      info  = "[ #{now} -- napp -- starting #{cfg.name.join} ... ]"
+      onow 'Starting', cmd[:show]
+      OU::FS.append olog, info; OU::FS.append elog, info
+      OU.spawn cmd[:cmd], chdir: dir, out: [olog, 'a'],
+                                      err: [elog, 'a']
+      wait! cfg, n
+    end
+  end                                                           # }}}1
 
-  # def self.start
-  # end
-
-  # def self.stop
-  # end
+  # stop napp-daemon
+  def self.stop(cfg)                                            # {{{1
+    sta = stat cfg, :stopped
+    if !sta[:alive]
+      s = sta[:status]
+      OU.opoo "process is not running (status=#{s})", log: cfg.logger
+    else
+      cmd = daemon_cmd cfg, OU.cfg.type.run, vars
+      onow 'Stopping', cmd[:show]
+      ::Process.kill 'SIGTERM', sta[:daemon_pid]
+    end
+  end                                                           # }}}1
 
   # --
+
+  # napp-daemon command
+  def self.daemon_cmd(cfg, cmd, vars)                           # {{{1
+    cmd1  = command cmd, vars
+    cmd2  = cmd1[:command]; sig = cmd1[:signal]
+    cmd3  = nohup ? OU::Cmd.nohup(cmd2) : cmd2
+    cmd4  = ['napp-daemon', Cfg.file_app_stat(cfg), sig] + cmd3
+    { cmd: cmd4, show: cmd2*' ' }
+  end                                                           # }}}1
+
+  # process killsig, shell, set vars
+  # returns { command: [command, ...], signal: signal }
+  def self.command(cmd, vars)                                   # {{{1
+    c1 = OU::Cmd.killsig cmd
+    c2 = OU::Cmd.shell c1[:command]; sh = c2[:shell]
+    c3 = OU::Cmd.set_vars c2[:command], vars
+    c4 = sh ? [sh, '-c', c3] : c3.split
+    { command: c4, signal: c1[:signal] }
+  end                                                           # }}}1
 
   # wait n secs; show message, dots, OK; die if process isn't running
   def self.wait!(cfg, n)                                        # {{{1
@@ -39,37 +84,43 @@ module Napp; module Daemon
     if s == :running
       OU.onow 'OK'
     else
-      OU.odie! "process is not running; status: #{s}", log: cfg.logger
+      OU.odie! "process is not running (status=#{s})", log: cfg.logger
     end
   end                                                           # }}}1
 
   # --
 
-  # get status from statfile (or nil if no file); see napp-daemon
-  # @raise StatError if no statfile and die
+  # get status from statfile; see napp-daemon
+  # @raise StatError if no statfile and nostat == :die
   # @raise StatError if unexpected data is encountered
-  def self.stat(cfg, die = false)                               # {{{1
+  def self.stat(cfg, nostat)                                    # {{{1
     f = Cfg.file_app_stat cfg
     if OU::FS.exists? f
       d = File.read f; l = x.split
       case l.first
-      when 'spawning'   ; { status: :spawning }
-      when 'running'    ; { status: :running,
+      when 'spawning'   ; { alive: true, status: :spawning }
+      when 'running'    ; { alive: true, status: :running,
                             daemon_pid: Integer(l[1]),
                             pid:        Integer(l[2]) }
-      when 'stopped'    ; { status: :stopped, exit: Integer(l[1]) }
-      when 'terminated' ; { status: :terminated, signal: l[1] }
-      when 'exited'     ; { status: :exited }
+      when 'stopped'    ; { alive: false, status: :stopped,
+                            exit: Integer(l[1]) }
+      when 'terminated' ; { alive: false, status: :terminated,
+                            signal: l[1] }
+      when 'exited'     ; { alive: false, status: :exited }
       else raise StatError, "Unexpected statfile: #{d}"
       end
     else
-      if die then raise StatError, 'No statfile' else nil end
+      case nostat
+      when :die     ; raise StatError, 'No statfile'
+      when :stopped ; { alive: false, status: :stopped, exit: nil }
+      else            nostat
+      end
     end
   end                                                           # }}}1
 
   # status + col(our) + age
   def self.info(cfg)                                            # {{{1
-    sta = stat(cfg) || { status: :stopped, exit: nil }
+    sta = stat cfg, :stopped
     age = sta[:pid] ? OU::Process.age(sta[:pid]) : nil
     col = case sta[:status]
     when :spawning    ; :yel
