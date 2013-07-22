@@ -117,7 +117,7 @@ module Napp; module Types; module Ruby
   # start app
   def self.start(cfg)
     sock = cfg.type.listen == :socket ? Cfg.file_app_sock(cfg) : nil
-    port = cfg.type.listen == :port ? cfg.type.port : nil
+    port = cfg.type.listen == :port ? cfg.type.port.to_s : nil
     vars = { 'SOCKET' => sock, 'PORT' => port }
     Daemon.start cfg, vars: vars, env: vars
   end
@@ -129,7 +129,7 @@ module Napp; module Types; module Ruby
 
   # restart app
   def self.restart(cfg)
-    start cfg; stop cfg
+    stop cfg; start cfg
   end
 
 end; end; end

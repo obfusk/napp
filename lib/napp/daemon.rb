@@ -70,8 +70,8 @@ module Napp; module Daemon
       info  = "[ #{now} -- napp -- starting #{cfg.name.join} ... ]"
       OU::FS.append olog, info; OU::FS.append elog, info
       OU.onow 'ENV', *OU::Cmd.env_to_a(env) if !env.empty?
-      OU.ospawn *cmd, chdir: dir, env: env, out: [olog, 'a'],
-                                            err: [elog, 'a']
+      OU.ospawn *cmd, chdir: dir, env: env,
+        out: [olog, 'a'], err: [elog, 'a'], in: '/dev/null'
       wait! cfg, n
     end
   end                                                           # }}}1
@@ -98,8 +98,8 @@ module Napp; module Daemon
   def self.daemon_cmd(cfg, cmd, vars, nohup = true)
     c1 = sh_var_sig_cmd cmd, vars
     c2 = c1[:command]; sig = c1[:signal]
-    c3 = nohup ? OU::Cmd.nohup(c2) : c2
-    ['napp-daemon', Cfg.file_app_stat(cfg), sig] + c3
+    c3 = ['napp-daemon', Cfg.file_app_stat(cfg), sig] + c2
+    nohup ? OU::Cmd.nohup(*c3) : c3
   end
 
   # process killsig, pass on to sh_var_cmd
@@ -139,7 +139,7 @@ module Napp; module Daemon
   def self.stat(cfg, nostat)                                    # {{{1
     f = Cfg.file_app_stat cfg
     if OU::FS.exists? f
-      d = File.read f; l = x.split
+      d = File.read f; l = d.split
       case l.first
       when 'spawning'   ; { alive: true, status: :spawning,
                             ok: false }

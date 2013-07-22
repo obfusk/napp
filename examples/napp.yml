@@ -53,7 +53,7 @@ commands:                                                       # {{{1
     CUSTOM_BOOT:  ./_scripts/bootstrap
     CUSTOM_UPD:   ./_scripts/update
     PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
-    RACKUP:       SIGINT bundle exec rackup -E production ${LISTEN}
+    RACKUP:       SIGINT bundle exec rackup -E production -p ${PORT}
     RAILS_BOOT:   napp-helper-bootstrap-rails
     RAILS_UPD:    napp-helper-update-rails
   mongo:
