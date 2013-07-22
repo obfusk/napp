@@ -22,7 +22,7 @@ module Napp; module Cmds; module New
 
   # --
 
-  # parse opts, validate; MODIFIES cfg
+  # parse opts, validate; MODIFIES cfg -> done
   def self.prepare!(cfg, args_)                                 # {{{1
     name_, type, repo, *args = OU::Valid.args 'new', args_, 3, nil
     Valid.type! type; Valid.repo! repo; t = Type.get type
@@ -51,9 +51,6 @@ module Napp; module Cmds; module New
   # create new app: clone + cfg
   def self.run(cfg, *args_)                                     # {{{1
     prepare! cfg, args_; name = cfg.name.join; app = cfg.app
-    # TODO {
-    if ENV['DEBUG_PRY'] == 'yes' then require 'pry'; binding.pry end
-    # } TODO
     cfg.logger["creating `#{name}' ..."]
     OU.odie! "app `#{name}' already exists", log: cfg.logger \
       if OU::FS.exists? Cfg.dir_app(cfg)

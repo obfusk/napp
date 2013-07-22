@@ -34,9 +34,9 @@ module Napp; module Daemon
 
   # --
 
-  # process running?
+  # process running? returns [alive, ok]
   def self.running?(cfg, s = nil)
-    (s || stat(cfg, :stopped))[:alive]
+    t = s || stat(cfg, :stopped); [t[:alive], t[:ok]]
   end
 
   # show app status; how: :quiet|short|verbose
@@ -56,9 +56,9 @@ module Napp; module Daemon
     nohup = opts.fetch :nohup, true ; n   = opts[:n] || 7
     vars  = opts[:vars] || {}       ; env = opts[:env] || {}
     sta   = stat cfg, :stopped
-    if running? cfg, sta
+    if sta[:alive]
       s = sta[:status]; p = sta[:pid] ? " pid=#{sta[:pid]}" : ''
-      OU.opoo "process is running (status=#{s}#{p})", log: cfg.logger
+      OU.opoo "process is running (status=#{s}#{p})"
     else
       now   = OU::OS.now; dir = Cfg.dir_app_app cfg
       cmd   = daemon_cmd cfg, alias_cmd(cfg.type.run), vars, nohup
@@ -75,9 +75,9 @@ module Napp; module Daemon
   # stop napp-daemon
   def self.stop(cfg)                                            # {{{1
     sta = stat cfg, :stopped
-    if !running? cfg, sta
+    if !sta[:alive]
       s = sta[:status]
-      OU.opoo "process is not running (status=#{s})", log: cfg.logger
+      OU.opoo "process is not running (status=#{s})"
     else
       ::Process.kill 'SIGTERM', sta[:daemon_pid]
     end
@@ -137,15 +137,19 @@ module Napp; module Daemon
     if OU::FS.exists? f
       d = File.read f; l = x.split
       case l.first
-      when 'spawning'   ; { alive: true, status: :spawning }
+      when 'spawning'   ; { alive: true, status: :spawning,
+                            ok: false }
       when 'running'    ; { alive: true, status: :running,
+                            ok: true,
                             daemon_pid: Integer(l[1]),
                             pid:        Integer(l[2]) }
       when 'stopped'    ; { alive: false, status: :stopped,
+                            ok: false,
                             exit: Integer(l[1]) }
       when 'terminated' ; { alive: false, status: :terminated,
-                            signal: l[1] }
-      when 'exited'     ; { alive: false, status: :exited }
+                            ok: true, signal: l[1] }
+      when 'exited'     ; { alive: false, status: :exited,
+                            ok: false }
       else raise StatError, "Unexpected statfile: #{d}"
       end
     else
