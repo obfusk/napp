@@ -2,7 +2,7 @@
 #
 # File        : napp/daemon.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-21
+# Date        : 2013-07-22
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -54,7 +54,9 @@ module Napp; module Daemon
       d = File.read f; l = x.split
       case l.first
       when 'spawning'   ; { status: :spawning }
-      when 'running'    ; { status: :running, pid: Integer(l[1]) }
+      when 'running'    ; { status: :running,
+                            daemon_pid: Integer(l[1]),
+                            pid:        Integer(l[2]) }
       when 'stopped'    ; { status: :stopped, exit: Integer(l[1]) }
       when 'terminated' ; { status: :terminated, signal: l[1] }
       when 'exited'     ; { status: :exited }
@@ -84,10 +86,10 @@ module Napp; module Daemon
     Util.col(s[:col]) + s[:status].to_s + Util.col(:non)
   end
 
-  # extra status info (if available): age+pid or exitstatus
+  # extra status info (if available): age+pids or exitstatus
   def self.info_extra(s)                                        # {{{1
     if s[:pid]
-      " (pid=#{s[:pid]} age=#{s[:age]})"
+      " (age=#{s[:age]} pid=#{s[:pid]} daemon=#{s[:daemon_pid]})"
     elsif s[:exit]
       " (exitstatus=#{s[:exit]})"
     else

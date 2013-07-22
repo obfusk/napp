@@ -4,7 +4,7 @@
 #
 # File        : napp-deamon
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-21
+# Date        : 2013-07-22
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -17,7 +17,7 @@
 #
 #   1. write 'spawning' to statfile
 #   2. start command in background
-#   3. write "running $pid" to statfile
+#   3. write "running $$ $pid" to statfile
 #   4. wait for process to end
 #   5. write "stopped $exitstatus" to statfile
 #
@@ -55,7 +55,7 @@ function handle_EXIT ()
 trap handle_TERM TERM; trap handle_INT INT; trap handle_EXIT EXIT
 echo spawning > "$statfile"
 "$@" & pid=$!
-echo "running $pid" > "$statfile"
+echo "running $$ $pid" > "$statfile"
 set +e; wait "$pid"; ret="$?"; set -e
 echo "stopped $ret" > "$statfile"; stopped=y
 
