@@ -2,7 +2,7 @@
 #
 # File        : napp/nginx.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-17
+# Date        : 2013-07-22
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -78,7 +78,7 @@ module Napp; module Nginx
         if nginx.max_body_size
       OU::Valid.invalid! 'invalid: proxy_buffering w/o server' \
         if nginx.proxy_buffering
-      nil
+      false
     end
   end                                                           # }}}1
 

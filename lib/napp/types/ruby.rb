@@ -77,6 +77,11 @@ module Napp; module Types; module Ruby
     OU::Valid.invalid! 'invalid: no socket or port' unless type.listen
     OU::Valid.invalid! 'no run command' unless type.run
     OU::Valid.invalid! 'no update command' unless type.update
+    if type.listen == :port
+      Valid.port! type.port
+      Valid.port_priviliged? type.port &&
+        OU.opoo "priviliged port: #{type.port}"
+    end
     Valid.path! 'logdir', type.logdir if type.logdir
     Valid.path! 'public', type.public if type.public
     type.nginx = Nginx.prepare!(cfg, type.nginx)
@@ -86,22 +91,46 @@ module Napp; module Types; module Ruby
 
   # --
 
+  # bootstrap app
   def self.bootstrap(cfg)
+    Daemon.bootstrap cfg
   end
 
+  # update app
+  def self.update(cfg)
+    Daemon.update cfg
+  end
+
+  # --
+
+  # is app running?
   def self.running?(cfg)
+    Daemon.running? cfg
   end
 
-  def self.status(cfg)
+  # show app status; how: :quiet|short|verbose
+  def self.status(cfg, how)
+    Daemon.status cfg, how
   end
 
+  # --
+
+  # start app
   def self.start(cfg)
+    sock = cfg.type.listen == :socket ? Cfg.file_app_sock(cfg) : nil
+    port = cfg.type.listen == :port ? cfg.type.port : nil
+    vars = { 'SOCKET' => sock, 'PORT' => port }
+    Daemon.start cfg, vars: vars
   end
 
+  # stop app
   def self.stop(cfg)
+    Daemon.start cfg, vars: vars
   end
 
+  # restart app
   def self.restart(cfg)
+    start cfg; stop cfg
   end
 
 end; end; end

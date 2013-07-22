@@ -18,20 +18,53 @@ module Napp; module Daemon
 
   # --
 
+  # run bootstrap command
+  def self.bootstrap(cfg)
+    cmd = sh_var_cmd cfg.type.bootstrap; dir = Cfg.dir_app_app cfg
+    OU.onow 'Bootstrapping', cmd*' '
+    OU.spawn_w cmd, chdir: dir
+  end
+
+  # run update command
+  def self.update(cfg)
+    cmd = sh_var_cmd cfg.type.update; dir = Cfg.dir_app_app cfg
+    OU.onow 'Updating', cmd*' '
+    OU.spawn_w cmd, chdir: dir
+  end
+
+  # --
+
+  # process running?
+  def self.running?(cfg, s = nil)
+    (s || stat(cfg, :stopped))[:alive]
+  end
+
+  # show app status; how: :quiet|short|verbose
+  def self.status(cfg, how)                                     # {{{1
+    sta = stat cfg, :stopped
+    case how
+    when :quiet   ; puts Daemon.info_quiet sta
+    when :short   ; puts Daemon.info_short sta
+    when :verbose ; Daemon.show_info_verbose sta
+    end
+  end                                                           # }}}1
+
+  # --
+
   # start process w/ napp-daemon (if not running), wait a few seconds
   def self.start(cfg, opts = {})                                # {{{1
     nohup = opts.fetch :nohup, true ; n   = opts[:n] || 7
     vars  = opts[:vars] || {}       ; sta = stat cfg, :stopped
-    if sta[:alive]
+    if running? cfg, sta
       s = sta[:status]; p = sta[:pid] ? " pid=#{sta[:pid]}" : ''
       OU.opoo "process is running (status=#{s}#{p})", log: cfg.logger
     else
       now   = OU::OS.now; dir = Cfg.dir_app_app cfg
-      cmd   = daemon_cmd cfg, OU.cfg.type.run, vars
+      cmd   = daemon_cmd cfg, cfg.type.run, vars, nohup
       olog  = Cfg.dir_app_log cfg, 'daemon-stdout.log'
       elog  = Cfg.dir_app_log cfg, 'daemon-stderr.log'
       info  = "[ #{now} -- napp -- starting #{cfg.name.join} ... ]"
-      onow 'Starting', cmd[:show]
+      OU.onow 'Starting', cmd[:show]
       OU::FS.append olog, info; OU::FS.append elog, info
       OU.spawn cmd[:cmd], chdir: dir, out: [olog, 'a'],
                                       err: [elog, 'a']
@@ -42,7 +75,7 @@ module Napp; module Daemon
   # stop napp-daemon
   def self.stop(cfg)                                            # {{{1
     sta = stat cfg, :stopped
-    if !sta[:alive]
+    if !running? cfg, sta
       s = sta[:status]
       OU.opoo "process is not running (status=#{s})", log: cfg.logger
     else
@@ -55,23 +88,27 @@ module Napp; module Daemon
   # --
 
   # napp-daemon command
-  def self.daemon_cmd(cfg, cmd, vars)                           # {{{1
-    cmd1  = command cmd, vars
+  def self.daemon_cmd(cfg, cmd, vars, nohup = true)             # {{{1
+    cmd1  = sh_var_sig_cmd cmd, vars
     cmd2  = cmd1[:command]; sig = cmd1[:signal]
     cmd3  = nohup ? OU::Cmd.nohup(cmd2) : cmd2
     cmd4  = ['napp-daemon', Cfg.file_app_stat(cfg), sig] + cmd3
     { cmd: cmd4, show: cmd2*' ' }
   end                                                           # }}}1
 
-  # process killsig, shell, set vars
+  # process killsig, pass on to sh_var_cmd
   # returns { command: [command, ...], signal: signal }
-  def self.command(cmd, vars)                                   # {{{1
-    c1 = OU::Cmd.killsig cmd
-    c2 = OU::Cmd.shell c1[:command]; sh = c2[:shell]
-    c3 = OU::Cmd.set_vars c2[:command], vars
-    c4 = sh ? [sh, '-c', c3] : c3.split
-    { command: c4, signal: c1[:signal] }
-  end                                                           # }}}1
+  def self.sh_var_sig_cmd(cmd, vars)
+    c1 = OU::Cmd.killsig cmd; c2 = sh_var_cmd c1[:command], vars
+    { command: c2, signal: c1[:signal] }
+  end
+
+  # process shell, set vars; returns [command, ...]
+  def self.sh_var_cmd(cmd, vars)
+    c1 = OU::Cmd.shell cmd; sh = c1[:shell]
+    c2 = OU::Cmd.set_vars c1[:command], vars
+    sh ? [sh, '-c', c2] : c2.split
+  end
 
   # wait n secs; show message, dots, OK; die if process isn't running
   def self.wait!(cfg, n)                                        # {{{1
