@@ -19,19 +19,17 @@ module Napp; module Daemon
   # --
 
   # run bootstrap command
-  def self.bootstrap(cfg)
+  def self.bootstrap(cfg, env = {})
     cmd = sh_var_cmd alias_cmd(cfg.type.bootstrap)
     dir = Cfg.dir_app_app cfg
-    OU.onow 'Bootstrapping', cmd*' '
-    OU.spawn_w cmd, chdir: dir
+    OU.chk_exit(cmd) { |a| OU.ospawn_w *a, chdir: dir, env: env }
   end
 
   # run update command
-  def self.update(cfg)
+  def self.update(cfg, env = {})
     cmd = sh_var_cmd alias_cmd(cfg.type.update)
     dir = Cfg.dir_app_app cfg
-    OU.onow 'Updating', cmd*' '
-    OU.spawn_w cmd, chdir: dir
+    OU.chk_exit(cmd) { |a| OU.ospawn_w *a, chdir: dir, env: env }
   end
 
   # --
@@ -56,7 +54,8 @@ module Napp; module Daemon
   # start process w/ napp-daemon (if not running), wait a few seconds
   def self.start(cfg, opts = {})                                # {{{1
     nohup = opts.fetch :nohup, true ; n   = opts[:n] || 7
-    vars  = opts[:vars] || {}       ; sta = stat cfg, :stopped
+    vars  = opts[:vars] || {}       ; env = opts[:env] || {}
+    sta   = stat cfg, :stopped
     if running? cfg, sta
       s = sta[:status]; p = sta[:pid] ? " pid=#{sta[:pid]}" : ''
       OU.opoo "process is running (status=#{s}#{p})", log: cfg.logger
@@ -66,10 +65,9 @@ module Napp; module Daemon
       olog  = Cfg.dir_app_log cfg, 'daemon-stdout.log'
       elog  = Cfg.dir_app_log cfg, 'daemon-stderr.log'
       info  = "[ #{now} -- napp -- starting #{cfg.name.join} ... ]"
-      OU.onow 'Starting', cmd[:show]
       OU::FS.append olog, info; OU::FS.append elog, info
-      OU.spawn cmd[:cmd], chdir: dir, out: [olog, 'a'],
-                                      err: [elog, 'a']
+      OU.ospawn *cmd, chdir: dir, env: env, out: [olog, 'a'],
+                                            err: [elog, 'a']
       wait! cfg, n
     end
   end                                                           # }}}1
@@ -81,8 +79,6 @@ module Napp; module Daemon
       s = sta[:status]
       OU.opoo "process is not running (status=#{s})", log: cfg.logger
     else
-      cmd = daemon_cmd cfg, alias_cmd(OU.cfg.type.run), vars
-      onow 'Stopping', cmd[:show]
       ::Process.kill 'SIGTERM', sta[:daemon_pid]
     end
   end                                                           # }}}1
@@ -95,13 +91,12 @@ module Napp; module Daemon
   end
 
   # napp-daemon command
-  def self.daemon_cmd(cfg, cmd, vars, nohup = true)             # {{{1
-    cmd1  = sh_var_sig_cmd cmd, vars
-    cmd2  = cmd1[:command]; sig = cmd1[:signal]
-    cmd3  = nohup ? OU::Cmd.nohup(cmd2) : cmd2
-    cmd4  = ['napp-daemon', Cfg.file_app_stat(cfg), sig] + cmd3
-    { cmd: cmd4, show: cmd2*' ' }
-  end                                                           # }}}1
+  def self.daemon_cmd(cfg, cmd, vars, nohup = true)
+    c1 = sh_var_sig_cmd cmd, vars
+    c2 = c1[:command]; sig = c1[:signal]
+    c3 = nohup ? OU::Cmd.nohup(c2) : c2
+    ['napp-daemon', Cfg.file_app_stat(cfg), sig] + c3
+  end
 
   # process killsig, pass on to sh_var_cmd
   # returns { command: [command, ...], signal: signal }
