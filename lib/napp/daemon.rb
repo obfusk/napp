@@ -2,7 +2,7 @@
 #
 # File        : napp/daemon.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-22
+# Date        : 2013-07-24
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -120,7 +120,7 @@ module Napp; module Daemon
   def self.wait!(cfg, n)                                        # {{{1
     if n > 0
       OU.onow 'Waiting', "#{n} seconds"
-      n.times { sleep 1; print '.'; STDOUT.flush }
+      n.times { sleep 1; print '.'; $stdout.flush }
       puts
     end
     s = stat(cfg, :die)[:status]
