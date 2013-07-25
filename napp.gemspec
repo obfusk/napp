@@ -6,6 +6,8 @@ Gem::Specification.new do |s|
   s.summary     = 'nightmare(less) application platform'
 
   s.description = <<-END.gsub(/^ {4}/, '')
+    nightmare(less) application platform
+
     ...
   END
 
@@ -17,12 +19,16 @@ Gem::Specification.new do |s|
 
   s.license     = 'GPLv2'
 
-  s.executables = %w{ napp napps }
-  s.files       = %w{ README.md napp.gemspec }\                 # TODO
-                + Dir['lib/napp/**/*.rb']
+  s.executables = %w{ napp napp-daemon }                        # TODO
+  s.files       = %w{ .yardopts README.md Rakefile } \
+                + %w{ napp.gemspec } \
+                + Dir['{lib,spec}/**/*.rb']                     # TODO
 
   s.add_runtime_dependency 'eft'
   s.add_runtime_dependency 'obfusk-util'
+
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec'
 
   s.required_ruby_version = '>= 1.9.1'
 end
