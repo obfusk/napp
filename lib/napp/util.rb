@@ -20,15 +20,8 @@ module Napp
 
   module Util
 
-    # OU::Term.colour
-    def self.col(*a)
-      OU::Term.colour *a
-    end
-
-    # OU::Term.colour_e
-    def self.cole(*a)
-      OU::Term.colour_e *a
-    end
+    OU.link_mod_method OU::Term, :colour  , self, :col
+    OU.link_mod_method OU::Term, :colour_e, self, :cole
 
   end
 

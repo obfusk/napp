@@ -16,7 +16,7 @@ module Napp; module Nginx
     proxy_buffering: nil
   }
 
-  NginxCfg  = OU.struct *DEFAULTS.keys
+  NginxCfg  = OU.struct(*DEFAULTS.keys)
   DEF       = 'nginx default'
 
   # --

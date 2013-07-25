@@ -20,7 +20,7 @@ module Napp; module Daemon
     cmd = sh_var_cmd alias_cmd(cfg, cfg.type.bootstrap), vars
     dir = Cfg.dir_app_app cfg
     OU.onow 'ENV', *OU::Cmd.env_to_a(env) if !env.empty?
-    OU.chk_exit(cmd) { |a| OU.ospawn_w *a, chdir: dir, env: env }
+    OU.chk_exit(cmd) { |a| OU.ospawn_w(*a, chdir: dir, env: env) }
   end
 
   # run update command
@@ -28,7 +28,7 @@ module Napp; module Daemon
     cmd = sh_var_cmd alias_cmd(cfg, cfg.type.update), vars
     dir = Cfg.dir_app_app cfg
     OU.onow 'ENV', *OU::Cmd.env_to_a(env) if !env.empty?
-    OU.chk_exit(cmd) { |a| OU.ospawn_w *a, chdir: dir, env: env }
+    OU.chk_exit(cmd) { |a| OU.ospawn_w(*a, chdir: dir, env: env) }
   end
 
   # --
@@ -67,8 +67,8 @@ module Napp; module Daemon
       info  = "[ #{now} -- napp -- starting #{cfg.name.join} ... ]"
       OU::FS.append olog, info; OU::FS.append elog, info
       OU.onow 'ENV', *OU::Cmd.env_to_a(env) if !env.empty?
-      OU.ospawn *cmd, chdir: dir, env: env,
-        out: [olog, 'a'], err: [elog, 'a'], in: '/dev/null'
+      OU.ospawn(*cmd, chdir: dir, env: env,
+        out: [olog, 'a'], err: [elog, 'a'], in: '/dev/null')
       wait! cfg, n
     end
   end                                                           # }}}1

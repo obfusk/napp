@@ -27,14 +27,14 @@ module Napp; module Cmds; module New
         vcs: cfg.global.defaults['app']['vcs'],
         branch: cfg.global.defaults['app']['branch']
       ) do |app|
-        cfg.type = t::TypeCfg.build(t::DEFAULTS) do |type|
-          op = opt_parser cfg, app, type, extra
+        cfg.type = t::TypeCfg.build(t::DEFAULTS) do |c_t|
+          op = opt_parser cfg, app, c_t, extra
           as = op.parse_r args
           as.empty? or raise OU::Valid::ArgumentError,
             'too many arguments'
           Valid.vcs! app.vcs; Valid.branch! app.branch
           extra.vcs_mod = VCS.get app.vcs
-          t.prepare! cfg, type
+          t.prepare! cfg, c_t
         end .check!
       end .check!
     end .check!

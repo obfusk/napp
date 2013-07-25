@@ -26,24 +26,24 @@ module Napp; module Cfg
 
   # --
 
-  Global  = OU.struct *%w{ dirs user users log_w_sudo commands
-                           defaults logfiles }
-  App     = OU.struct *%w{ type repo vcs branch }
-  Extra   = OU.struct *%w{ type type_mod vcs_mod }
-  Dirs    = OU.struct *%w{ apps log nginx app }
-  AppDirs = OU.struct *%w{ app cfg log run }
+  Global  = OU.struct(*%w{ dirs user users log_w_sudo commands
+                           defaults logfiles })
+  App     = OU.struct(*%w{ type repo vcs branch })
+  Extra   = OU.struct(*%w{ type type_mod vcs_mod })
+  Dirs    = OU.struct(*%w{ apps log nginx app })
+  AppDirs = OU.struct(*%w{ app cfg log run })
 
   # --
 
-  All = OU.struct *%w{ nappcfg global log other
-                       name app type extra } do                 # {{{1
+  All = OU.struct(*%w{ nappcfg global log other
+                       name app type extra }) do                # {{{1
     # pass self to self.log
     def logger
       self.log[self]
     end
   end                                                           # }}}1
 
-  Name = OU.struct *%w{ user app } do                           # {{{1
+  Name = OU.struct(*%w{ user app }) do                          # {{{1
     # join: user+sep+app
     def join(sep = '/')
       "#{user}#{sep}#{app}"
@@ -84,8 +84,7 @@ module Napp; module Cfg
 
   # ENV['NAPPCFG'] if set and not empty, DEFAULT_NAPPCFG otherwise
   def self.nappcfg
-    env = ENV['NAPPCFG']
-    dir = (env && !env.empty?) ? env : DEFAULT_NAPPCFG
+    OU.empty_as_nil(ENV['NAPPCFG']) || DEFAULT_NAPPCFG
   end
 
   # --
