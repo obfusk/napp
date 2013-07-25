@@ -29,6 +29,7 @@
   * remove `DEBUG_PRY`
   * should init script remove old pid files ?!
   * what about pid file command checks ?!
+  * document that napp/cfg must be loaded first!
 
 ## Description
 []: {{{1

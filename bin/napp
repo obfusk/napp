@@ -7,10 +7,8 @@ unless Gem.loaded_specs.include? 'napp'
   $:.unshift *libs
 end
 
-require 'napp/cfg'
+require 'napp/cfg' # first!
 require 'napp/cmd'
-require 'napp/log'
-require 'napp/util'
 
 Napp::Cfg.config do |cfg|
   begin

@@ -2,7 +2,7 @@
 #
 # File        : napp/types/ruby.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-22
+# Date        : 2013-07-25
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -11,7 +11,6 @@
 
 require 'napp/daemon'
 require 'napp/nginx'
-require 'napp/util'
 
 module Napp; module Types; module Ruby
 

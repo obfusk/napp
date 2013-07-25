@@ -16,10 +16,10 @@ end
 desc 'Check for warnings'
 task :warn do
   libs = (['lib'] + Dir['deps/*/lib']).map { |x| "-I #{x}" } *' '
-  Dir['lib/**/*.rb'].each do |x|
-    name = x.sub(/^lib\//,'').sub(/\.rb$/,'')
-    sh "ruby -w #{libs} -r #{name} -e ''"
-  end
+  reqs = Dir['lib/**/*.rb'].sort.map do |x|
+    '-r ' + x.sub(/^lib\//,'').sub(/\.rb$/,'')
+  end * ' '
+  sh "ruby -w #{libs} -r napp/cfg #{reqs} -e ''"
 end
 
 desc 'Generate docs'
