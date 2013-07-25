@@ -48,7 +48,8 @@ install-shallow:
 	  PREFIX_DOC=$(PREFIX)/doc PREFIX_RM=$(PREFIX)
 
 clean:
-	rm -fr *.gem *.tar _archive _tmp examples/nginx.d
+	rm -fr *.gem *.tar .yardoc _archive _tmp examples/nginx.d \
+	  yardoc
 	find -name '*~' -delete
 
 archive: all

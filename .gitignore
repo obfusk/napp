@@ -3,7 +3,9 @@
 
 /*.gem
 /*.tar
+/.yardoc
 /_archive
 /_tmp
 /deps
 /examples/nginx.d
+/yardoc
