@@ -1,0 +1,33 @@
+napp:
+  dirs:
+    apps: <%= @apps %>
+    log: <%= "#{@home}/#{@log}" %>
+    nginx: nginx.d
+    app:
+      app: app
+      cfg: cfg
+      log: log
+      run: run
+  user: napp
+  users: []
+  log_w_sudo: true
+defaults:
+  app:
+    vcs: git
+    branch: master
+  daemon:
+    wait: 7
+  nginx:
+    validate_server_name: true
+    max_body_size:
+    proxy_buffering:
+    ssl: false
+  ruby:
+    logdir: log
+    public: public
+commands:
+  aliases:
+    BUNDLE: bundle install
+    RACKUP: SIGINT bundle exec rackup -E production -p ${PORT}
+  mongo:
+  postgres:
