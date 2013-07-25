@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/ruby -w
 
 unless Gem.loaded_specs.include? 'napp'
   libs = [File.expand_path('../../lib', __FILE__)]
