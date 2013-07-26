@@ -2,7 +2,7 @@
 #
 # File        : napp/cfg.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-25
+# Date        : 2013-07-26
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -154,7 +154,7 @@ module Napp; module Cfg
 
   # global napp.log path
   def self.file_log(cfg)
-    "#{cfg.global.dirs.log}/nap.log"
+    "#{cfg.global.dirs.log}/napp.log"
   end
 
   # global nginx config dir path
@@ -177,7 +177,7 @@ module Napp; module Cfg
 
   # napp.log path
   def self.file_app_log(cfg)
-    dir_app_log cfg, 'nap.log'
+    dir_app_log cfg, 'napp.log'
   end
 
   # daemon.stat path
@@ -264,7 +264,7 @@ module Napp; module Cfg
 
   # App -> Extra
   def self.app_to_extra(app)
-    Cfg::Extra.build(type: app.type, type_mod: Type.get(app.type),
+    Extra.build(type: app.type, type_mod: Type.get(app.type),
       vcs_mod: VCS.get(app.vcs)).check!
   end
 

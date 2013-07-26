@@ -1,0 +1,10 @@
+---
+type: ruby
+listen: :port
+port: 8888
+run: RACKUP
+bootstrap: BUNDLE
+update: BUNDLE
+logdir: false
+public: false
+nginx: false

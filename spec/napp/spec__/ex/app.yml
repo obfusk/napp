@@ -1,0 +1,5 @@
+---
+type: ruby
+repo: ../napp-hello-sinatra
+vcs: git
+branch: master
