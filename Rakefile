@@ -1,3 +1,20 @@
+libs = (['lib'] + Dir['deps/*/lib']).map { |x| "-I #{x}" } *' '
+
+desc 'Run cucumber'
+task :cuke do
+  sh 'cucumber -fprogress'
+end
+
+desc 'Run cucumber verbosely'
+task 'cuke:verbose' do
+  sh 'cucumber'
+end
+
+desc 'Run cucumber verbosely, view w/ less'
+task 'cuke:less' do
+  sh 'cucumber -c | less -R'
+end
+
 desc 'Run specs'
 task :spec do
   sh 'rspec -c'
@@ -15,11 +32,16 @@ end
 
 desc 'Check for warnings'
 task :warn do
-  libs = (['lib'] + Dir['deps/*/lib']).map { |x| "-I #{x}" } *' '
   reqs = Dir['lib/**/*.rb'].sort.map do |x|
     '-r ' + x.sub(/^lib\//,'').sub(/\.rb$/,'')
   end * ' '
   sh "ruby -w #{libs} -r napp/cfg #{reqs} -e ''"
+end
+
+desc 'Check for warnings in specs'
+task 'warn:spec' do
+  reqs = Dir['spec/**/*.rb'].sort.map { |x| "-r ./#{x}" } * ' '
+  sh "ruby -w #{libs} -r rspec #{reqs} -e ''"
 end
 
 desc 'Generate docs'
