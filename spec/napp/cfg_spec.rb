@@ -13,12 +13,13 @@
 
 require 'napp/cfg'
 
+ou          = Obfusk::Util
 cfg         = Napp::Cfg
 ex_napp_yml = File.read 'examples/napp.yml'
 ex_app_yml  = File.read 'spec/napp/spec__/ex/app.yml'
 ex_type_yml = File.read 'spec/napp/spec__/ex/type.yml'
 
-fake_cfg    = cfg::All.new(                                     # {{{1
+fake_cfg = cfg::All.new(                                        # {{{1
   nappcfg: 'NAPPCFG',
   global: cfg::Global.new(
     dirs: cfg::Dirs.new(
@@ -30,7 +31,7 @@ fake_cfg    = cfg::All.new(                                     # {{{1
   name: cfg::app_name('foo').freeze
 ).freeze                                                        # }}}1
 
-fake_cfg2   = Obfusk::Util.deepdup(fake_cfg)
+fake_cfg2 = ou.deepdup(fake_cfg)
 fake_cfg2.global.dirs.nginx = '/NGINX'
 
 describe 'napp/cfg' do
@@ -69,7 +70,7 @@ describe 'napp/cfg' do
       expect {
         cfg.config(nappcfg: 'fake', global: 'fake', log: 'fake')
       } .to \
-        raise_exception(Obfusk::Util::BetterStruct::IncompleteError,
+        raise_exception(ou::BetterStruct::IncompleteError,
                         /empty field/)
     end
   end                                                           # }}}1
@@ -95,23 +96,21 @@ describe 'napp/cfg' do
 
   context 'app_name' do                                         # {{{1
     it 'valid w/o user' do
-      expect(cfg.app_name('foo').join).to \
-        eq("#{Obfusk::Util::OS.user}/foo")
+      expect(cfg.app_name('foo').join).to eq("#{ou::OS.user}/foo")
     end
     it 'valid w/ user' do
       expect(cfg.app_name('foo/bar').join).to eq('foo/bar')
     end
     it 'invalid' do
       expect { cfg.app_name('foo!') } .to \
-        raise_exception(Obfusk::Util::Valid::ValidationError,
-                        'invalid name')
+        raise_exception(ou::Valid::ValidationError, 'invalid name')
     end
   end                                                           # }}}1
 
   context 'dirs_app' do                                         # {{{1
     it 'dirs_app' do
       expect(cfg.dirs_app(fake_cfg) .all? { |x|
-        x.start_with? "#{Obfusk::Util::OS.home}/APPS/foo"
+        x.start_with? "#{ou::OS.home}/APPS/foo"
       }).to be_true
     end
   end                                                           # }}}1
@@ -119,23 +118,23 @@ describe 'napp/cfg' do
   context 'dir_app*' do                                         # {{{1
     it 'dir_app' do
       expect(cfg.dir_app(fake_cfg, 'some', 'dir')).to \
-        eq("#{Obfusk::Util::OS.home}/APPS/foo/some/dir")
+        eq("#{ou::OS.home}/APPS/foo/some/dir")
     end
     it 'dir_app_app' do
       expect(cfg.dir_app_app(fake_cfg, 'test')).to \
-        eq("#{Obfusk::Util::OS.home}/APPS/foo/APP/test")
+        eq("#{ou::OS.home}/APPS/foo/APP/test")
     end
     it 'dir_app_cfg' do
       expect(cfg.dir_app_cfg(fake_cfg, 'test')).to \
-        eq("#{Obfusk::Util::OS.home}/APPS/foo/CFG/test")
+        eq("#{ou::OS.home}/APPS/foo/CFG/test")
     end
     it 'dir_app_log' do
       expect(cfg.dir_app_log(fake_cfg, 'test')).to \
-        eq("#{Obfusk::Util::OS.home}/APPS/foo/LOG/test")
+        eq("#{ou::OS.home}/APPS/foo/LOG/test")
     end
     it 'dir_app_run' do
       expect(cfg.dir_app_run(fake_cfg, 'test')).to \
-        eq("#{Obfusk::Util::OS.home}/APPS/foo/RUN/test")
+        eq("#{ou::OS.home}/APPS/foo/RUN/test")
     end
   end                                                           # }}}1
 
@@ -152,23 +151,23 @@ describe 'napp/cfg' do
     end
     it 'file_app_cfg_app' do
       expect(cfg.file_app_cfg_app(fake_cfg)).to \
-        eq("#{Obfusk::Util::OS.home}/APPS/foo/CFG/app.yml")
+        eq("#{ou::OS.home}/APPS/foo/CFG/app.yml")
     end
     it 'file_app_cfg_type' do
       expect(cfg.file_app_cfg_type(fake_cfg)).to \
-        eq("#{Obfusk::Util::OS.home}/APPS/foo/CFG/type.yml")
+        eq("#{ou::OS.home}/APPS/foo/CFG/type.yml")
     end
     it 'file_app_log' do
       expect(cfg.file_app_log(fake_cfg)).to \
-        eq("#{Obfusk::Util::OS.home}/APPS/foo/LOG/napp.log")
+        eq("#{ou::OS.home}/APPS/foo/LOG/napp.log")
     end
     it 'file_app_stat' do
       expect(cfg.file_app_stat(fake_cfg)).to \
-        eq("#{Obfusk::Util::OS.home}/APPS/foo/RUN/daemon.stat")
+        eq("#{ou::OS.home}/APPS/foo/RUN/daemon.stat")
     end
     it 'file_app_sock' do
       expect(cfg.file_app_sock(fake_cfg)).to \
-        eq("#{Obfusk::Util::OS.home}/APPS/foo/RUN/daemon.sock")
+        eq("#{ou::OS.home}/APPS/foo/RUN/daemon.sock")
     end
   end                                                           # }}}1
 
