@@ -1,8 +1,8 @@
 # --                                                            ; {{{1
 #
-# File        : _sandbox.rb
+# File        : napp/spec__/sandbox.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-25
+# Date        : 2013-07-26
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -18,31 +18,51 @@ require 'tmpdir'
 module Napp; module Spec__
 
   class Sandbox                                                 # {{{1
-    NAPP_YML_ERB = 'spec/_cfg/napp.yml.erb'
 
-    def setup
+    NAPP_YML_ERB = 'spec/napp/spec__/cfg/napp.yml.erb'
+
+    # --
+
+    def dir_sandbox (abs = false) _dir @sand, abs end
+    def dir_apps    (abs = false) _dir @apps, abs end
+    def dir_cfg     (abs = false) _dir @cfg , abs end
+    def dir_log     (abs = false) _dir @log , abs end
+
+    # --
+
+    # setup: set @home, @sand/@apps/@cfg/@log (relative to @home), and
+    # @temp; create tempdir + subdirs + symlink; turn erb into
+    # napp.yml
+    def setup                                                   # {{{2
       @home = Obfusk::Util::OS.home
       @sand = ".napp-sandbox-#{Obfusk::Util::OS.now '%s'}"
       @apps = "#{@sand}/apps"
-      @log  = "#{@sand}/log"
       @cfg  = "#{@sand}/cfg"
+      @log  = "#{@sand}/log"
       @temp = Dir.mktmpdir
       File.symlink @temp, "#{@home}/#{@sand}"
-      [@apps,@log,@cfg].each do |x|
+      [@apps, @cfg, @log].each do |x|
         FileUtils.mkdir_p "#{@home}/#{x}"
       end
       _process_napp_yml_erb
-    end
+    end                                                         # }}}2
 
+    # teardown: remove tempdir + symlink
     def teardown
       FileUtils.remove_entry_secure @temp
       File.unlink "#{@home}/#{@sand}"
     end
 
+    # --
+
+    def _dir(dir, abs) abs ? "#{@home}/#{dir}" : dir end
+
+    # turn napp.yml.erb into napp.yml in sandbox
     def _process_napp_yml_erb
       File.write "#{@home}/#{@cfg}/napp.yml",
         ERB.new(File.read(NAPP_YML_ERB)).result(binding)
     end
+
   end                                                           # }}}1
 
 end; end

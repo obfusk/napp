@@ -1,7 +1,7 @@
 napp:
   dirs:
-    apps: <%= @apps %>
-    log: <%= "#{@home}/#{@log}" %>
+    apps: <%= dir_apps %>
+    log: <%= dir_log(:abs) %>
     nginx: nginx.d
     app:
       app: app

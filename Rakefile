@@ -71,3 +71,8 @@ desc 'Undo SNAPSHOT gem'
 task 'snapshot:undo' do
   sh 'git checkout -- lib/napp/version.rb'
 end
+
+desc 'Pry w/ libs'
+task :pry do
+  sh "pry #{libs}"
+end
