@@ -2,7 +2,7 @@
 #
 # File        : napp/nginx_spec.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-26
+# Date        : 2013-07-27
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -12,13 +12,14 @@
 require 'napp/cfg'
 require 'napp/nginx'
 
+ex  = Napp__Spec::EXAMPLES
 ou  = Obfusk::Util
 cfg = Napp::Cfg
 ngi = Napp::Nginx
 
-ex = ->(n) {
-  File.read("spec/napp/spec__/ex/nginx#{n}.conf")
-    .gsub(/USER/, ou::OS.user) .gsub(/HOME/, ou::OS.home)
+nex = ->(n) {
+  File.read("#{ex}/nginx#{n}.conf") .gsub(/USER/, ou::OS.user) \
+                                    .gsub(/HOME/, ou::OS.home)
 }
 
 fake_cfg = ->(t) {                                          # {{{1
@@ -46,7 +47,7 @@ describe 'napp/nginx' do
           max_body_size: nil, proxy_buffering: nil
         ).freeze, port: 8888, listen: :port
       }]
-      expect(ngi.config c).to eq(ex[1])
+      expect(ngi.config c).to eq(nex[1])
     end
     it 'config #2' do
       c = fake_cfg[{
@@ -55,7 +56,7 @@ describe 'napp/nginx' do
           max_body_size: '10m', proxy_buffering: nil
         ).freeze, listen: :socket
       }]
-      expect(ngi.config c).to eq(ex[2])
+      expect(ngi.config c).to eq(nex[2])
     end
     it 'config #3' do
       c = fake_cfg[{
@@ -64,7 +65,7 @@ describe 'napp/nginx' do
           max_body_size: nil, proxy_buffering: false
         ).freeze, listen: :socket
       }]
-      expect(ngi.config c).to eq(ex[3])
+      expect(ngi.config c).to eq(nex[3])
     end
   end                                                           # }}}1
 

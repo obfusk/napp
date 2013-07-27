@@ -1,8 +1,8 @@
 # --                                                            ; {{{1
 #
-# File        : napp/spec__/sandbox.rb
+# File        : napp/spec/sandbox.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-26
+# Date        : 2013-07-27
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -15,11 +15,11 @@ require 'erb'
 require 'fileutils'
 require 'tmpdir'
 
-module Napp; module Spec__
+module Napp__Spec
 
   class Sandbox                                                 # {{{1
 
-    NAPP_YML_ERB = 'spec/napp/spec__/cfg/napp.yml.erb'
+    NAPP_YML_ERB = "#{EXAMPLES}/napp.yml.erb"
 
     # --
 
@@ -65,6 +65,6 @@ module Napp; module Spec__
 
   end                                                           # }}}1
 
-end; end
+end
 
 # vim: set tw=70 sw=2 sts=2 et fdm=marker :

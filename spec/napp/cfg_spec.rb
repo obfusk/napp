@@ -2,7 +2,7 @@
 #
 # File        : napp/cfg_spec.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-26
+# Date        : 2013-07-27
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -13,11 +13,12 @@
 
 require 'napp/cfg'
 
+ex          = Napp__Spec::EXAMPLES
 ou          = Obfusk::Util
 cfg         = Napp::Cfg
-ex_napp_yml = File.read 'examples/napp.yml'
-ex_app_yml  = File.read 'spec/napp/spec__/ex/app.yml'
-ex_type_yml = File.read 'spec/napp/spec__/ex/type.yml'
+ex_napp_yml = File.read "#{ex}/napp.yml"
+ex_app_yml  = File.read "#{ex}/app.yml"
+ex_type_yml = File.read "#{ex}/type.yml"
 
 fake_cfg = cfg::All.new(                                        # {{{1
   nappcfg: 'NAPPCFG',

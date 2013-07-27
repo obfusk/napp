@@ -1,4 +1,5 @@
 libs = (['lib'] + Dir['deps/*/lib']).map { |x| "-I #{x}" } *' '
+spec = libs + ' -I test/lib -r napp/spec/helper'
 
 desc 'Run cucumber'
 task :cuke do
@@ -17,17 +18,17 @@ end
 
 desc 'Run specs'
 task :spec do
-  sh 'rspec -c'
+  sh "rspec #{spec} -c"
 end
 
 desc 'Run specs verbosely'
 task 'spec:verbose' do
-  sh 'rspec -cfd'
+  sh "rspec #{spec} -cfd"
 end
 
 desc 'Run specs verbosely, view w/ less'
 task 'spec:less' do
-  sh 'rspec -cfd --tty | less -R'
+  sh "rspec #{spec} -cfd --tty | less -R"
 end
 
 desc 'Check for warnings'
@@ -41,7 +42,7 @@ end
 desc 'Check for warnings in specs'
 task 'warn:spec' do
   reqs = Dir['spec/**/*.rb'].sort.map { |x| "-r ./#{x}" } * ' '
-  sh "ruby -w #{libs} -r rspec #{reqs} -e ''"
+  sh "ruby -w -r rspec #{spec} #{reqs} -e ''"
 end
 
 desc 'Generate docs'
