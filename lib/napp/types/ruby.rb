@@ -2,7 +2,7 @@
 #
 # File        : napp/types/ruby.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-25
+# Date        : 2013-07-28
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -82,7 +82,7 @@ module Napp; module Types; module Ruby
     type.nginx = Nginx.prepare!(cfg, type.nginx)
     type.nginx.freeze if type.nginx   # done.
     # TODO: build/check! nginx ?!
-    if type.listen == :port && Valid.port_priviliged?(type.port)
+    if type.listen == :port && Valid.priviliged_port?(type.port)
       OU.opoo "port #{type.port} is priviliged"
     end
   end                                                           # }}}1

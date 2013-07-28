@@ -2,7 +2,7 @@
 #
 # File        : napp/valid.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-25
+# Date        : 2013-07-28
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -13,10 +13,22 @@ module Napp; module Valid
 
   # NB: keep it simple: some false positives, nothing dangerous
 
-  WORD    = %r{[a-zA-Z0-9_-]+}                                  # TODO
-  PATH    = %r{(#{WORD}/)*#{WORD}}                              # TODO
-  SERVER  = %r{[a-z0-9.*-]+|_}                                  # TODO
-  URL     = %r{[a-zA-Z0-9@.:/_-]+}                              # TODO
+  WORD      = %r{[a-zA-Z0-9_-]+}                                # TODO
+
+  MAX_BODY  = %r{[0-9]+m|0}                                     # TODO
+  PATH      = %r{(#{WORD}/)*#{WORD}}                            # TODO
+  SERVER    = %r{[a-z0-9.*-]+|_}                                # TODO
+  URL       = %r{[a-zA-Z0-9@.:/_-]+}                            # TODO
+
+  # --
+
+  def self.priviliged_port?(port)
+    port < 1024
+  end
+
+  def self.port!(port)
+    (1..65535).include?(port) || OU::Valid.invalid!('invalid port')
+  end
 
   # --
 
@@ -29,15 +41,7 @@ module Napp; module Valid
   end
 
   def self.max_body_size!(size)
-    OU::Valid.validate! size, /^([0-9]+m|0)$/, 'max_body_size'
-  end
-
-  def self.port!(port)
-    (1..65535).include?(port) || OU::Valid.invalid!('invalid port')
-  end
-
-  def self.port_priviliged?(port)
-    port < 1024
+    OU::Valid.validate! size, MAX_BODY, 'max_body_size'
   end
 
   def self.path!(name, path)
