@@ -2,7 +2,7 @@
 #
 # File        : napp/cmd.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-25
+# Date        : 2013-07-28
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -56,7 +56,7 @@ module Napp
       elsif c = which[cmd]
         c.run cfg, *args
       else
-        raise OU::ArgumentError, "no such subcommand: #{cmd}"
+        raise OU::Valid::ArgumentError, "no such subcommand: #{cmd}"
       end
     end                                                         # }}}1
 
@@ -69,7 +69,7 @@ module Napp
       elsif c = which[cmd]
         puts c.help cfg, *args
       else
-        raise OU::ArgumentError, "no such subcommand: #{cmd}"
+        raise OU::Valid::ArgumentError, "no such subcommand: #{cmd}"
       end
     end                                                         # }}}1
 

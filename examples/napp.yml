@@ -53,7 +53,7 @@ commands:                                                       # {{{1
   # run/bootstrap/update command aliases
   aliases:
     UBERJAR:      lein uberjar
-    JAR:          java -jar project.jar
+    JAR:          java -jar project.jar ${PORT}
     BUNDLE:       bundle install
     RACKUP:       SIGINT bundle exec rackup -E production -p ${PORT}
     PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
