@@ -73,7 +73,7 @@ module Napp; module Types; module Ruby
   def self.prepare!(cfg, type)                                  # {{{1
     # NB: nothing to validate for commands except presence
     type.bootstrap = type.update unless type.bootstrap
-    OU::Valid.invalid! 'invalid: no socket or port' unless type.listen
+    OU::Valid.invalid! 'no socket or port' unless type.listen
     OU::Valid.invalid! 'no run command' unless type.run
     OU::Valid.invalid! 'no update command' unless type.update
     Valid.port! type.port if type.listen == :port

@@ -34,6 +34,12 @@ defaults:                                                       # {{{1
   app:
     vcs: git
     branch: master
+  clojure:
+    logdir: log
+    public: public
+  ruby:
+    logdir: log
+    public: public
   daemon:
     wait: 7
   nginx:
@@ -41,23 +47,20 @@ defaults:                                                       # {{{1
     max_body_size:      # nginx default
     proxy_buffering:    # nginx default
     ssl: false
-  ruby:
-    logdir: log
-    public: public
                                                                 # }}}1
 
 commands:                                                       # {{{1
   # run/bootstrap/update command aliases
   aliases:
+    UBERJAR:      lein uberjar
+    JAR:          java -jar project.jar
     BUNDLE:       bundle install
+    RACKUP:       SIGINT bundle exec rackup -E production -p ${PORT}
+    PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
     CUSTOM_BOOT:  ./_scripts/bootstrap
     CUSTOM_UPD:   ./_scripts/update
-    JAR:          java -jar project.jar
-    PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
-    RACKUP:       SIGINT bundle exec rackup -E production -p ${PORT}
     RAILS_BOOT:   napp-helper-bootstrap-rails                   # TODO
     RAILS_UPD:    napp-helper-update-rails                      # TODO
-    UBERJAR:      lein uberjar
   mongo:
   postgres:
                                                                 # }}}1
