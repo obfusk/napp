@@ -114,12 +114,14 @@ module Napp; module Types; module Ruby
   # --
 
   # start app
-  def self.start(cfg)
-    sock = cfg.type.listen == :socket ? Cfg.file_app_sock(cfg) : nil
-    port = cfg.type.listen == :port ? cfg.type.port.to_s : nil
-    vars = { 'SOCKET' => sock, 'PORT' => port }
-    Daemon.start cfg, vars: vars, env: vars
-  end
+  def self.start(cfg)                                           # {{{1
+    sock  = cfg.type.listen == :socket ? Cfg.file_app_sock(cfg) : nil
+    port  = cfg.type.listen == :port ? cfg.type.port.to_s : nil
+    vars  = { 'SOCKET' => sock, 'PORT' => port }
+    n     = cfg.global.defaults['daemon']['wait']
+    Util.rm_if_exists sock if sock
+    Daemon.start cfg, vars: vars, env: vars, n: n
+  end                                                           # }}}1
 
   # stop app
   def self.stop(cfg)
