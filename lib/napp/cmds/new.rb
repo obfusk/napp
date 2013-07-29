@@ -2,7 +2,7 @@
 #
 # File        : napp/cmds/new.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-25
+# Date        : 2013-07-29
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -11,14 +11,14 @@
 
 module Napp; module Cmds; module New
 
-  USAGE   = 'napp new <name> <type> <repo> [<opt(s)>]'
+  USAGE   = 'napp new <type> <name> <repo> [<opt(s)>]'
   HELP    = 'napp help new [<type>]'
 
   # --
 
   # parse opts, validate; MODIFIES cfg -> done
   def self.prepare!(cfg, args_)                                 # {{{1
-    name_, type, repo, *args = OU::Valid.args 'new', args_, 3, nil
+    type, name_, repo, *args = OU::Valid.args 'new', args_, 3, nil
     Valid.type! type; Valid.repo! repo; t = Type.get type
     cfg.name = Cfg.app_name name_
     cfg.extra = Cfg::Extra.build(type: type, type_mod: t) do |extra|
