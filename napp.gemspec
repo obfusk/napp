@@ -27,6 +27,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'eft'
   s.add_runtime_dependency 'obfusk-util'
 
+  s.add_development_dependency 'aruba'
+  s.add_development_dependency 'cucumber'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
 

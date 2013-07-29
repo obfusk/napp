@@ -1,5 +1,12 @@
 libs = (['lib'] + Dir['deps/*/lib']).map { |x| "-I #{x}" } *' '
-spec = libs + ' -I test/lib -r napp/spec/helper'
+spec = '-I test/lib -r napp/spec/helper'
+
+ENV['NAPPCFG']  = "#{Dir.pwd}/examples"
+ENV['PATH']     = "#{Dir.pwd}/bin:#{ENV['PATH']}"
+ENV['RUBYOPT']  = "#{ENV['RUBYOPT']} #{libs}"
+
+desc 'Run all tests'
+task test: [:cuke, :spec, :warn, 'warn:spec']
 
 desc 'Run cucumber'
 task :cuke do
@@ -14,6 +21,11 @@ end
 desc 'Run cucumber verbosely, view w/ less'
 task 'cuke:less' do
   sh 'cucumber -c | less -R'
+end
+
+desc 'Cucumber step defs'
+task 'cuke:steps' do
+  sh 'cucumber -c -fstepdefs | less -R'
 end
 
 desc 'Run specs'
@@ -36,13 +48,19 @@ task :warn do
   reqs = Dir['lib/**/*.rb'].sort.map do |x|
     '-r ' + x.sub(/^lib\//,'').sub(/\.rb$/,'')
   end * ' '
-  sh "ruby -w #{libs} -r napp/cfg #{reqs} -e ''"
+  c = "ruby -w -r napp/cfg #{reqs} -e '' 2>&1"
+  puts c; x = %x[ #{c} ]
+  puts '=== warnings ===', x unless x.empty?
+  puts
 end
 
 desc 'Check for warnings in specs'
 task 'warn:spec' do
   reqs = Dir['spec/**/*.rb'].sort.map { |x| "-r ./#{x}" } * ' '
-  sh "ruby -w -r rspec #{spec} #{reqs} -e ''"
+  c = "ruby -w -r rspec #{spec} #{reqs} -e '' 2>&1"
+  puts c; x = %x[ #{c} ]
+  puts '=== spec warnings ===', x unless x.empty?
+  puts
 end
 
 desc 'Generate docs'
@@ -73,7 +91,14 @@ task 'snapshot:undo' do
   sh 'git checkout -- lib/napp/version.rb'
 end
 
-desc 'Pry w/ libs'
+desc 'Pry w/ env'
 task :pry do
-  sh "pry #{libs}"
+  sh 'pry'
+end
+
+desc 'Environment'
+task :env do
+  puts "export PATH='#{ENV['PATH']}'"
+  puts "export NAPPCFG='#{ENV['NAPPCFG']}'"
+  puts "export RUBYOPT='#{ENV['RUBYOPT']}'"
 end

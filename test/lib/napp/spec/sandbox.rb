@@ -2,7 +2,7 @@
 #
 # File        : napp/spec/sandbox.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-27
+# Date        : 2013-07-29
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -23,6 +23,13 @@ module Napp__Spec
 
     # --
 
+    # init
+    def initialize
+      @env = {}
+    end
+
+    # --
+
     def dir_sandbox (abs = false) _dir @sand, abs end
     def dir_apps    (abs = false) _dir @apps, abs end
     def dir_cfg     (abs = false) _dir @cfg , abs end
@@ -35,7 +42,7 @@ module Napp__Spec
     # napp.yml
     def setup                                                   # {{{2
       @home = Obfusk::Util::OS.home
-      @sand = ".napp-sandbox-#{Obfusk::Util::OS.now '%s'}"
+      @sand = ".napp-sandbox-#{Obfusk::Util::OS.now '%s.%N'}"
       @apps = "#{@sand}/apps"
       @cfg  = "#{@sand}/cfg"
       @log  = "#{@sand}/log"
@@ -51,6 +58,19 @@ module Napp__Spec
     def teardown
       FileUtils.remove_entry_secure @temp
       File.unlink "#{@home}/#{@sand}"
+    end
+
+    # --
+
+    # set $NAPPCFG
+    def set_env
+      @env['NAPPCFG'] = ENV['NAPPCFG']
+      ENV['NAPPCFG']  = dir_cfg :abs
+    end
+
+    # restore $NAPPCFG
+    def restore_env
+      ENV['NAPPCFG'] = @env['NAPPCFG']
     end
 
     # --
