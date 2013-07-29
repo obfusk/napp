@@ -15,6 +15,10 @@ defaults:
   app:
     vcs: git
     branch: master
+  types:
+    daemon:
+      logdir: log
+      public: public
   daemon:
     wait: 7
   nginx:
@@ -22,9 +26,6 @@ defaults:
     max_body_size:
     proxy_buffering:
     ssl: false
-  ruby:
-    logdir: log
-    public: public
 commands:
   aliases:
     BUNDLE: bundle install

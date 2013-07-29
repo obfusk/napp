@@ -1,8 +1,8 @@
 # --                                                            ; {{{1
 #
-# File        : napp/types/ruby.rb
+# File        : napp/types/daemon.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-28
+# Date        : 2013-07-29
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -12,11 +12,12 @@
 require 'napp/daemon'
 require 'napp/nginx'
 
-module Napp; module Types; module Ruby
+module Napp; module Types; module Daemon
 
   DEFAULTS = {
-    type: 'ruby', listen: nil, port: false, run: nil, bootstrap: nil,
-    update: nil, logdir: false, public: false, nginx: false
+    type: 'daemon', listen: nil, port: false, run: nil,
+    bootstrap: nil, update: nil, logdir: false, public: false,
+    nginx: false
   }
 
   TypeCfg = OU.struct(*DEFAULTS.keys) do                        # {{{1
@@ -37,7 +38,7 @@ module Napp; module Types; module Ruby
 
   # extends Cmd::New option parser; MODIFIES cfg
   def self.options(o, cfg, type)                                # {{{1
-    d = cfg.global.defaults['ruby']
+    d = cfg.global.defaults['types']['daemon']
     o.on('--socket', 'Listen on socket') do |x|
       type.listen = :socket
     end

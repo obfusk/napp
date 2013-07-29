@@ -1,5 +1,5 @@
 ---
-type: ruby
+type: daemon
 repo: ../napp-hello-sinatra
 vcs: git
 branch: master

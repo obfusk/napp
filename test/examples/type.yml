@@ -1,5 +1,5 @@
 ---
-type: ruby
+type: daemon
 listen: :port
 port: 8888
 run: RACKUP

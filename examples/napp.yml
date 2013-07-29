@@ -34,12 +34,10 @@ defaults:                                                       # {{{1
   app:
     vcs: git
     branch: master
-  clojure:
-    logdir: log
-    public: public
-  ruby:
-    logdir: log
-    public: public
+  types:
+    daemon:
+      logdir: log
+      public: public
   daemon:
     wait: 7
   nginx:

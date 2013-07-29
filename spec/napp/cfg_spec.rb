@@ -2,7 +2,7 @@
 #
 # File        : napp/cfg_spec.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-27
+# Date        : 2013-07-29
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -196,7 +196,7 @@ describe 'napp/cfg' do
     it 'load_type' do
       expect(cfg.load_type(
         cfg::All.new(extra: cfg::Extra.new(
-          type_mod: Napp::Types::Ruby)), ex_type_yml
+          type_mod: Napp::Types::Daemon)), ex_type_yml
       ).port).to eq(8888)
     end
   end                                                           # }}}1
@@ -206,7 +206,7 @@ describe 'napp/cfg' do
       expect(cfg.dump_type(cfg::All.new(
         type: cfg.load_type(
           cfg::All.new(extra: cfg::Extra.new(
-            type_mod: Napp::Types::Ruby)), ex_type_yml
+            type_mod: Napp::Types::Daemon)), ex_type_yml
       )))).to eq(ex_type_yml)
     end
   end                                                           # }}}1
@@ -215,7 +215,7 @@ describe 'napp/cfg' do
     it 'app_to_extra' do
       expect(cfg.app_to_extra(
         cfg.load_app(nil, ex_app_yml)
-      ).type_mod).to eq(Napp::Types::Ruby)
+      ).type_mod).to eq(Napp::Types::Daemon)
     end
   end                                                           # }}}1
 

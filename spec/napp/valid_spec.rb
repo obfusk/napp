@@ -2,7 +2,7 @@
 #
 # File        : napp/valid_spec.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-28
+# Date        : 2013-07-29
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -55,13 +55,13 @@ describe 'napp/valid' do
 
   context 'type!' do                                            # {{{1
     it 'valid' do
-      expect { va.type! 'ruby' } .to_not raise_error
+      expect { va.type! 'daemon' } .to_not raise_error
     end
     it 'invalid (empty)' do
       expect { va.type! '' } .to raise_error(ve, 'invalid type')
     end
     it 'invalid (!)' do
-      expect { va.type! 'clojure!' } .to \
+      expect { va.type! 'foo!' } .to \
         raise_error(ve, 'invalid type')
     end
   end                                                           # }}}1
