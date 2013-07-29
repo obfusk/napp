@@ -2,7 +2,7 @@
 #
 # File        : napp/valid.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-28
+# Date        : 2013-07-29
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -28,6 +28,10 @@ module Napp; module Valid
 
   def self.port!(port)
     (1..65535).include?(port) || OU::Valid.invalid!('invalid port')
+  end
+
+  def self.seconds!(n)
+    (0..60).include?(n) || OU::Valid.invalid!('invalid seconds')
   end
 
   # --

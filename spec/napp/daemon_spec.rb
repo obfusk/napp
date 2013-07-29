@@ -2,7 +2,7 @@
 #
 # File        : napp/daemon_spec.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-26
+# Date        : 2013-07-29
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -19,8 +19,8 @@ dae = Napp::Daemon
 fake_cfg = cfg::All.new(                                        # {{{1
   global: cfg::Global.new(
     commands: { 'aliases' => {
-      'BUNDLE' => 'bundle install',
-      'RACKUP' => 'SIGINT bundle exec rackup -E production -p ${PORT}'
+      'BUNDLE'    => 'bundle install',
+      'RAILS_UPD' => %w{ _bundle_ _migrate_ _assets_ },
     } },
     dirs: cfg::Dirs.new(
       apps: 'APPS',
@@ -32,6 +32,17 @@ fake_cfg = cfg::All.new(                                        # {{{1
 ).freeze                                                        # }}}1
 
 describe 'napp/daemon' do
+
+  context 'flatten_cmds' do                                      # {{{1
+    it 'flat' do
+      expect(dae.flatten_cmds(fake_cfg, %w{ BUNDLE BUNDLE })).to \
+        eq(['bundle install', 'bundle install'])
+    end
+    it 'nested' do
+      expect(dae.flatten_cmds(fake_cfg, %w{ BUNDLE RAILS_UPD })).to \
+        eq(['bundle install', '_bundle_', '_migrate_', '_assets_'])
+    end
+  end                                                           # }}}1
 
   context 'alias_cmd' do                                        # {{{1
     it 'w/ alias' do

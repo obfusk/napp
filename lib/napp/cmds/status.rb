@@ -2,7 +2,7 @@
 #
 # File        : napp/cmds/status.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-25
+# Date        : 2013-07-29
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -42,14 +42,14 @@ module Napp; module Cmds; module Status
   # option parser
   def self.opt_parser(opts)                                     # {{{1
     OU::Opt::Parser.new 'Options:' do |o|
-      o.on('--quiet', 'Quiet output: just (coloured) status') do
+      o.on('-q', '--quiet', 'Quiet output: just (coloured) status') do
         opts[:how] = :quiet
       end
-      o.on('--short',
-           'Short output: (coloured) status + extra info') do
+      o.on('-s', '--short',
+           'Short output: (coloured) status, extra info') do
         opts[:how] = :short
       end
-      o.on('--verbose', 'Verbose output (default)') do
+      o.on('-v', '--verbose', 'Verbose output (default)') do
         opts[:how] = :verbose
       end
     end

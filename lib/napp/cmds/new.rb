@@ -76,12 +76,12 @@ module Napp; module Cmds; module New
     OU::Opt::Parser.new 'Options:' do |o|
       o.on('--vcs VCS',
            'Version control system; ' +
-           "default is #{cfg.global.defaults['vcs']}") do |x|
+           "default is #{cfg.global.defaults['app']['vcs']}") do |x|
         app.vcs = x
       end
-      o.on('--branch BRANCH',
+      o.on('-b', '--branch BRANCH',
            'VCS branch; default is ' +
-           "#{cfg.global.defaults['branch']}") do |x|
+           "#{cfg.global.defaults['app']['branch']}") do |x|
         app.branch = x
       end
       if t = extra.type_mod

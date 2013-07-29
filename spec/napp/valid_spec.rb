@@ -40,6 +40,26 @@ describe 'napp/valid' do
     end
   end                                                           # }}}1
 
+  context 'seconds!' do                                         # {{{1
+    it 'valid (0)' do
+      expect { va.seconds! 0 } .to_not raise_error
+    end
+    it 'valid (60)' do
+      expect { va.seconds! 60 } .to_not raise_error
+    end
+    it 'invalid (string)' do
+      expect { va.seconds! '5' } .to \
+        raise_error(ve, 'invalid seconds')
+    end
+    it 'invalid (too low)' do
+      expect { va.seconds!(-1) } .to \
+        raise_error(ve, 'invalid seconds')
+    end
+    it 'invalid (too high)' do
+      expect { va.seconds! 61 } .to raise_error(ve, 'invalid seconds')
+    end
+  end                                                           # }}}1
+
   context 'branch!' do                                          # {{{1
     it 'valid' do
       expect { va.branch! 'master' } .to_not raise_error

@@ -3,8 +3,11 @@ type: daemon
 listen: :port
 port: 8888
 run: RACKUP
-bootstrap: BUNDLE
-update: BUNDLE
+bootstrap:
+- BUNDLE
+update:
+- BUNDLE
 logdir: false
 public: false
+wait: 7
 nginx: false

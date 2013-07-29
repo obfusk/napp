@@ -2,7 +2,7 @@
 #
 # File        : napp/daemon.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-25
+# Date        : 2013-07-29
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -15,20 +15,14 @@ module Napp; module Daemon
 
   # --
 
-  # run bootstrap command
+  # run bootstrap command(s)
   def self.bootstrap(cfg, vars = {}, env = {})
-    cmd = sh_var_cmd alias_cmd(cfg, cfg.type.bootstrap), vars
-    dir = Cfg.dir_app_app cfg
-    OU.onow 'ENV', *OU::Cmd.env_to_a(env) if !env.empty?
-    OU.chk_exit(cmd) { |a| OU.ospawn_w(*a, chdir: dir, env: env) }
+    run_cmds cfg, cfg.type.bootstrap, vars, env
   end
 
-  # run update command
+  # run update command(s)
   def self.update(cfg, vars = {}, env = {})
-    cmd = sh_var_cmd alias_cmd(cfg, cfg.type.update), vars
-    dir = Cfg.dir_app_app cfg
-    OU.onow 'ENV', *OU::Cmd.env_to_a(env) if !env.empty?
-    OU.chk_exit(cmd) { |a| OU.ospawn_w(*a, chdir: dir, env: env) }
+    run_cmds cfg, cfg.type.update, vars, env
   end
 
   # --
@@ -77,14 +71,28 @@ module Napp; module Daemon
   def self.stop(cfg)                                            # {{{1
     sta = stat cfg, :ok
     if !sta[:alive]
-      s = sta[:status]
-      OU.opoo "process is not running (status=#{s})"
+      OU.opoo "process is not running (status=#{sta[:status]})"
     else
       ::Process.kill 'SIGTERM', sta[:daemon_pid]
     end
   end                                                           # }}}1
 
   # --
+
+  # run command(s)
+  def self.run_cmds(cfg, cmds, vars = {}, env = vars)           # {{{1
+    cs  = flatten_cmds(cfg, cmds).map { |x| sh_var_cmd x, vars }
+    dir = Cfg.dir_app_app cfg
+    OU.onow 'ENV', *OU::Cmd.env_to_a(env) if !env.empty?
+    cs.each do |c|
+      OU.chk_exit(c) { |a| OU.ospawn_w(*a, chdir: dir, env: env) }
+    end
+  end                                                           # }}}1
+
+  # flatten + alias commands
+  def self.flatten_cmds(cfg, cmds)
+    cmds.map { |x| alias_cmd cfg, x } .flatten
+  end
 
   # lookup alias
   def self.alias_cmd(cfg, cmd)
