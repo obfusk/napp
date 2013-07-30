@@ -1,5 +1,5 @@
-@announce @sandbox
-Feature: NAPPCFG, napp, napp version, napp help
+@announce @sandbox @napp
+Feature: NAPPCFG, napp, version, help
 
   Scenario: NAPPCFG
 
@@ -34,6 +34,18 @@ Feature: NAPPCFG, napp, napp version, napp help
       Usage: napp { <command> [<arg(s)>] | help [<command>] | version }
 
       Commands: bootstrap, new, restart, start, status, stop, update
+
+      """
+
+  @fail
+  Scenario: napp foo
+
+    When  I run `napp foo`
+    Then  the exit status should be 1
+    And   the stderr should contain exactly:
+      """
+      Error: no such subcommand: foo
+      Usage: napp { <command> [<arg(s)>] | help [<command>] | version }
 
       """
 

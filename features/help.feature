@@ -1,4 +1,4 @@
-@announce @sandbox
+@announce @sandbox @help
 Feature: napp help <command>
 
   Scenario: napp help bootstrap
@@ -119,6 +119,54 @@ Feature: napp help <command>
     Then  it should pass with exactly:
       """
       Usage: napp update <name>
+
+      """
+
+  @fail
+  Scenario: napp help foo
+
+    When  I run `napp help foo`
+    Then  the exit status should be 1
+    And   the stderr should contain exactly:
+      """
+      Error: no such subcommand: foo
+      Usage: napp { <command> [<arg(s)>] | help [<command>] | version }
+
+      """
+
+  @fail
+  Scenario: napp help new foo
+
+    When  I run `napp help new foo`
+    Then  the exit status should be 1
+    And   the stderr should contain exactly:
+      """
+      Error: no such type: foo
+      Usage: napp { <command> [<arg(s)>] | help [<command>] | version }
+
+      """
+
+  @fail
+  Scenario: napp help bootstrap foo
+
+    When  I run `napp help bootstrap foo`
+    Then  the exit status should be 1
+    And   the stderr should contain exactly:
+      """
+      Error: help bootstrap expected 0..0 arguments, got 1
+      Usage: napp { <command> [<arg(s)>] | help [<command>] | version }
+
+      """
+
+  @fail
+  Scenario: napp help new daemon foo
+
+    When  I run `napp help new daemon foo`
+    Then  the exit status should be 1
+    And   the stderr should contain exactly:
+      """
+      Error: help new expected 0..1 arguments, got 2
+      Usage: napp { <command> [<arg(s)>] | help [<command>] | version }
 
       """
 
