@@ -13,4 +13,8 @@ When(/^I run `([^`]*)` with bash$/) do |cmd|
   run_simple "bash -c \"#{cmd}\"", false
 end
 
+When(/^I run `([^`]*)` with:$/) do |cmd,opts|
+  run_simple unescape(([cmd] + opts.raw.flatten)*' '), false
+end
+
 # vim: set tw=70 sw=2 sts=2 et fdm=marker :

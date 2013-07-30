@@ -13,8 +13,6 @@ Feature: napp help <command>
   Scenario: napp help new
     When  I run `napp help new`
     Then  it should pass with exactly:
-
-                                                                # {{{1
       """
       Usage: napp new <type> <name> <repo> [<opt(s)>]
 
@@ -28,14 +26,11 @@ Feature: napp help <command>
       VCSs: git
 
       """
-                                                                # }}}1
 
   Scenario: napp help new daemon
 
     When  I run `napp help new daemon`
     Then  it should pass with exactly:
-
-                                                                # {{{1
       """
       Usage: napp new <type> <name> <repo> [<opt(s)>]
 
@@ -70,7 +65,6 @@ Feature: napp help <command>
       VCSs: git
 
       """
-                                                                # }}}1
 
   Scenario: napp help restart
 

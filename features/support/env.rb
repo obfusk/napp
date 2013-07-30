@@ -2,7 +2,7 @@
 #
 # File        : features/support/env.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-29
+# Date        : 2013-07-30
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -17,6 +17,10 @@ require 'napp/spec/sandbox'
 require 'aruba/cucumber'
 
 # --
+
+Before('@slow') do
+  @aruba_timeout_seconds = 10
+end
 
 Before('@sandbox') do
   @sandbox = Napp__Spec::Sandbox.new

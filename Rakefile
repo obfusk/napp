@@ -1,5 +1,6 @@
-libs = (['lib'] + Dir['deps/*/lib']).map { |x| "-I #{x}" } *' '
-spec = '-I test/lib -r napp/spec/helper'
+libs  = (['lib'] + Dir['deps/*/lib']).map { |x| "-I #{x}" } *' '
+spec  = '-I test/lib -r napp/spec/helper'
+cuke  = ENV['CUKE']
 
 ENV['NAPPCFG']  = "#{Dir.pwd}/examples"
 ENV['PATH']     = "#{Dir.pwd}/bin:#{ENV['PATH']}"
@@ -10,17 +11,17 @@ task test: [:cuke, :spec, :warn, 'warn:spec']
 
 desc 'Run cucumber'
 task :cuke do
-  sh 'cucumber -fprogress'
+  sh "cucumber -fprogress #{cuke}"
 end
 
 desc 'Run cucumber verbosely'
 task 'cuke:verbose' do
-  sh 'cucumber'
+  sh "cucumber #{cuke}"
 end
 
 desc 'Run cucumber verbosely, view w/ less'
 task 'cuke:less' do
-  sh 'cucumber -c | less -R'
+  sh "cucumber -c #{cuke} | less -R"
 end
 
 desc 'Cucumber step defs'
