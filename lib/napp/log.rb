@@ -2,7 +2,7 @@
 #
 # File        : napp/log.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-30
+# Date        : 2013-07-31
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2

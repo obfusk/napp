@@ -28,7 +28,17 @@ defaults:
     ssl: false
 commands:
   aliases:
-    BUNDLE: bundle install
-    RACKUP: SIGINT bundle exec rackup -E production -p ${PORT}
+    UBERJAR:      lein uberjar
+    JAR:          java -jar project.jar ${PORT}
+    BUNDLE:       &bundle   bundle install
+    MIGRATE:      &migrate  SHELL RAILS_ENV=production
+                              bundle exec rake db:migrate
+    ASSETS:       &assets   SHELL RAILS_ENV=production
+                              bundle exec rake assets:precompile
+    RAILS_UPD:    [*bundle, *migrate, *assets]
+    RACKUP:       SIGINT bundle exec rackup -E production -p ${PORT}
+    PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
+    CUSTOM_BOOT:  ./_scripts/bootstrap
+    CUSTOM_UPD:   ./_scripts/update
   mongo:
   postgres:

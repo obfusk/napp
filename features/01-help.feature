@@ -4,7 +4,8 @@ Feature: napp help <command>
   Scenario: napp help bootstrap
 
     When  I run `napp help bootstrap`
-    Then  it should pass with exactly:
+    Then  it should succeed
+    And   the last stdout should be:
       """
       Usage: napp bootstrap <name>
 
@@ -12,7 +13,8 @@ Feature: napp help <command>
 
   Scenario: napp help new
     When  I run `napp help new`
-    Then  it should pass with exactly:
+    Then  it should succeed
+    And   the last stdout should be:
       """
       Usage: napp new <type> <name> <repo> [<opt(s)>]
 
@@ -30,7 +32,8 @@ Feature: napp help <command>
   Scenario: napp help new daemon
 
     When  I run `napp help new daemon`
-    Then  it should pass with exactly:
+    Then  it should succeed
+    And   the last stdout should be:
       """
       Usage: napp new <type> <name> <repo> [<opt(s)>]
 
@@ -69,7 +72,8 @@ Feature: napp help <command>
   Scenario: napp help restart
 
     When  I run `napp help restart`
-    Then  it should pass with exactly:
+    Then  it should succeed
+    And   the last stdout should be:
       """
       Usage: napp restart <name>
 
@@ -78,7 +82,8 @@ Feature: napp help <command>
   Scenario: napp help start
 
     When  I run `napp help start`
-    Then  it should pass with exactly:
+    Then  it should succeed
+    And   the last stdout should be:
       """
       Usage: napp start <name>
 
@@ -87,7 +92,8 @@ Feature: napp help <command>
   Scenario: napp help status
 
     When  I run `napp help status`
-    Then  it should pass with exactly:
+    Then  it should succeed
+    And   the last stdout should be:
       """
       Usage: napp status <name> [<opt(s)>]
 
@@ -101,7 +107,8 @@ Feature: napp help <command>
   Scenario: napp help stop
 
     When  I run `napp help stop`
-    Then  it should pass with exactly:
+    Then  it should succeed
+    And   the last stdout should be:
       """
       Usage: napp stop <name>
 
@@ -110,7 +117,8 @@ Feature: napp help <command>
   Scenario: napp help update
 
     When  I run `napp help update`
-    Then  it should pass with exactly:
+    Then  it should succeed
+    And   the last stdout should be:
       """
       Usage: napp update <name>
 
@@ -121,7 +129,7 @@ Feature: napp help <command>
 
     When  I run `napp help foo`
     Then  the exit status should be 1
-    And   the stderr should contain exactly:
+    And   the last stderr should be:
       """
       Error: no such subcommand: foo
       Usage: napp { <command> [<arg(s)>] | help [<command>] | version }
@@ -133,7 +141,7 @@ Feature: napp help <command>
 
     When  I run `napp help new foo`
     Then  the exit status should be 1
-    And   the stderr should contain exactly:
+    And   the last stderr should be:
       """
       Error: no such type: foo
       Usage: napp { <command> [<arg(s)>] | help [<command>] | version }
@@ -145,7 +153,7 @@ Feature: napp help <command>
 
     When  I run `napp help bootstrap foo`
     Then  the exit status should be 1
-    And   the stderr should contain exactly:
+    And   the last stderr should be:
       """
       Error: help bootstrap expected 0..0 arguments, got 1
       Usage: napp { <command> [<arg(s)>] | help [<command>] | version }
@@ -157,7 +165,7 @@ Feature: napp help <command>
 
     When  I run `napp help new daemon foo`
     Then  the exit status should be 1
-    And   the stderr should contain exactly:
+    And   the last stderr should be:
       """
       Error: help new expected 0..1 arguments, got 2
       Usage: napp { <command> [<arg(s)>] | help [<command>] | version }

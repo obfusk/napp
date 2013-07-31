@@ -46,7 +46,7 @@ module Napp__Spec
       @apps = "#{@sand}/apps"
       @cfg  = "#{@sand}/cfg"
       @log  = "#{@sand}/log"
-      @temp = Dir.mktmpdir
+      @temp = Dir.mktmpdir 'napp-sandbox'
       File.symlink @temp, "#{@home}/#{@sand}"
       [@apps, @cfg, @log].each do |x|
         FileUtils.mkdir_p "#{@home}/#{x}"

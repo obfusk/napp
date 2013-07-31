@@ -2,7 +2,7 @@
 #
 # File        : napp/types/daemon.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-29
+# Date        : 2013-07-31
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -139,7 +139,7 @@ module Napp; module Types; module Daemon
 
   # restart app
   def self.restart(cfg)
-    stop cfg; start cfg
+    stop cfg; sleep 1; start cfg                                # TODO
   end
 
 end; end; end
