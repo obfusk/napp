@@ -1,4 +1,4 @@
-@announce @sandbox @help
+@sandbox @help
 Feature: napp help <command>
 
   Scenario: napp help bootstrap

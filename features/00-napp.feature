@@ -1,5 +1,13 @@
-@announce @sandbox @napp
-Feature: NAPPCFG, napp, version, help
+@sandbox @napp
+Feature: SANDBOX, NAPPCFG, napp, version, help
+
+  Scenario: SANDBOX
+
+    When  I run `echo $SANDBOX` with bash
+    Then  it should pass with regexp:
+      """
+      ^(/\w+)+/.napp-sandbox-\d+\.\d+$
+      """
 
   Scenario: NAPPCFG
 

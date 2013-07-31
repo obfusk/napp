@@ -2,7 +2,7 @@
 #
 # File        : features/support/env.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-30
+# Date        : 2013-07-31
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -18,6 +18,17 @@ require 'aruba/cucumber'
 
 # --
 
+Before do
+  @verbose = ENV['VERBOSE'] == 'yes'
+  if @verbose
+    @announce_stdout  = true
+    @announce_stderr  = true
+    @announce_cmd     = true
+    @announce_dir     = true
+    @announce_env     = true
+  end
+end
+
 Before('@slow') do
   @aruba_timeout_seconds = 10
 end
@@ -25,7 +36,7 @@ end
 Before('@sandbox') do
   @sandbox = Napp__Spec::Sandbox.new
   @sandbox.setup; @sandbox.set_env
-  puts "[sandbox #{@sandbox.dir_sandbox :abs}]"
+  puts "[sandbox #{@sandbox.dir_sandbox :abs}]" if @verbose
 end
 
 After('@sandbox') do

@@ -2,7 +2,7 @@
 #
 # File        : napp/spec/sandbox.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-29
+# Date        : 2013-07-31
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -62,14 +62,17 @@ module Napp__Spec
 
     # --
 
-    # set $NAPPCFG
+    # set $SANDBOX, $NAPPCFG
     def set_env
+      @env['SANDBOX'] = ENV['SANDBOX']
       @env['NAPPCFG'] = ENV['NAPPCFG']
+      ENV['SANDBOX']  = dir_sandbox :abs
       ENV['NAPPCFG']  = dir_cfg :abs
     end
 
-    # restore $NAPPCFG
+    # restore $SANDBOX, $NAPPCFG
     def restore_env
+      ENV['SANDBOX'] = @env['SANDBOX']
       ENV['NAPPCFG'] = @env['NAPPCFG']
     end
 

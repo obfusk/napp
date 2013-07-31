@@ -1,4 +1,4 @@
-@announce @sandbox @slow @new
+@sandbox @slow @new
 Feature: napp new daemon hello-{rb,clj} ...
 
   Scenario Outline: napp new daemon

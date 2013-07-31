@@ -7,11 +7,16 @@ ENV['PATH']     = "#{Dir.pwd}/bin:#{ENV['PATH']}"
 ENV['RUBYOPT']  = "#{ENV['RUBYOPT']} #{libs}"
 
 desc 'Run all tests'
-task test: [:cuke, :spec, :warn, 'warn:spec']
+task test: ['cuke:strict', :spec, :warn, 'warn:spec']
 
 desc 'Run cucumber'
 task :cuke do
   sh "cucumber -fprogress #{cuke}"
+end
+
+desc 'Run cucumber strictly'
+task 'cuke:strict' do
+  sh "cucumber -fprogress -S #{cuke}"
 end
 
 desc 'Run cucumber verbosely'
@@ -95,6 +100,11 @@ end
 desc 'Pry w/ env'
 task :pry do
   sh 'pry'
+end
+
+desc 'Run w/ env'
+task :run do
+  sh ENV['RUN']
 end
 
 desc 'Environment'
