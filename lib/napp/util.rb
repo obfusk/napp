@@ -2,7 +2,7 @@
 #
 # File        : napp/util.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-28
+# Date        : 2013-08-01
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -19,6 +19,15 @@ module Napp
   OU = Obfusk::Util
 
   module Util
+
+    # TODO
+    def self.pretty_dot_hash(h, w = 29, pre = [])
+      f = ->(p,v) { sprintf "%-#{w}s : %s", p*'.', v }
+      h.map do |k,v|
+        p = pre + [k]
+        v.is_a?(Hash) ? pretty_dot_hash(v, w, p) : f[p,v]
+      end*"\n"
+    end
 
     # delete files if they exist; ohai (if any exist)
     def self.rm_if_exists(*files)

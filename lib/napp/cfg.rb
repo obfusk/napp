@@ -2,7 +2,7 @@
 #
 # File        : napp/cfg.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-26
+# Date        : 2013-08-01
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -226,9 +226,14 @@ module Napp; module Cfg
     load_app cfg, File.read(file_app_cfg_app(cfg))
   end
 
+  # dump App to Hash
+  def self.app_to_hash(cfg)
+    cfg.app.to_str_h
+  end
+
   # dump App to YAML string
   def self.dump_app(cfg)
-    YAML.dump cfg.app.to_str_h
+    YAML.dump app_to_hash(cfg)
   end
 
   # dump App to YAML app cfg file
@@ -250,9 +255,14 @@ module Napp; module Cfg
     load_type cfg, File.read(file_app_cfg_type(cfg))
   end
 
+  # dump type to Hash
+  def self.type_to_hash(cfg)
+    cfg.type.dump
+  end
+
   # dump type to YAML string
   def self.dump_type(cfg)
-    YAML.dump cfg.type.dump
+    YAML.dump type_to_hash(cfg)
   end
 
   # dump type to YAML app cfg file
