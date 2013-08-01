@@ -139,9 +139,31 @@ Feature: napp <command> ...
       """
     When  I run `curl -s localhost:<port>`
     Then  it should fail
+    When  I run `napp info <name>`
+    Then  it should succeed
+    And   the last stdout should match:
+      """
+      \Aname                          : \w+/<name>
+      app\.type                      : daemon
+      app\.repo                      : \S+/<repo>
+      app\.vcs                       : git
+      app\.branch                    : master
+      type\.type                     : daemon
+      type\.listen                   : port
+      type\.port                     : <port>
+      type\.run                      : <run>
+      type\.bootstrap                : \["<update>"\]
+      type\.update                   : \["<update>"\]
+      type\.logdir                   : false
+      type\.public                   : false
+      type\.wait_start               : <wait-start>
+      type\.wait_stop                : <wait-stop>
+      type\.nginx                    : false
+      \Z
+      """
     Examples:
       | name      | repo                  | port  | wait-start  | wait-stop | run     | update    | run-cmd             | upd-cmds                  |
-      | hello-clj | napp-hello-compojure  | 10001 | 1           | 1         | JAR     | UBERJAR   | java -jar           | lein uberjar              |
+      | hello-clj | napp-hello-compojure  | 10001 | 2           | 1         | JAR     | UBERJAR   | java -jar           | lein uberjar              |
       | hello-py  | napp-hello-flask      | 10002 | 1           | 1         | VPY     | VENV_PIP  | venv python         | bash -c test -e, venv pip |
       | hello-rb  | napp-hello-sinatra    | 10003 | 1           | 1         | RACKUP  | BUNDLE    | bundle exec rackup  | bundle install            |
 

@@ -20,14 +20,16 @@ module Napp
 
   module Util
 
-    # TODO
-    def self.pretty_dot_hash(h, w = 29, pre = [])
-      f = ->(p,v) { sprintf "%-#{w}s : %s", p*'.', v }
+    # config in "foo.bar : value1\nbaz.qux : value2" format
+    def self.pretty_config(h, opts = {})                        # {{{1
+      w = opts[:width] || 29; i = opts[:indent] || ''
+      p = opts[:path] || []
+      f = ->(x,v) { sprintf "%s%-#{w}s : %s", i, x*'.', v }
       h.map do |k,v|
-        p = pre + [k]
-        v.is_a?(Hash) ? pretty_dot_hash(v, w, p) : f[p,v]
-      end*"\n"
-    end
+        p2 = p + [k]; o2 = opts.merge path: p2
+        v.is_a?(Hash) ? pretty_config(v, o2) : f[p2,v]
+      end * "\n"
+    end                                                         # }}}1
 
     # delete files if they exist; ohai (if any exist)
     def self.rm_if_exists(*files)
@@ -35,6 +37,8 @@ module Napp
         OU.ohai "rm #{fs*' '}"; fs.each { |x| File.delete x }
       end
     end
+
+    # --
 
     OU.link_mod_method OU::Term, :colour  , self, :col
     OU.link_mod_method OU::Term, :colour_e, self, :cole

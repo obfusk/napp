@@ -16,7 +16,7 @@ module Napp; module Cmds; module Info
 
   USAGE = 'napp info <name> [<opt(s)>]'
 
-  DEFAULTS = { how: :human }
+  DEFAULTS = { how: :human, width: 29 }
 
   # --
 
@@ -30,17 +30,17 @@ module Napp; module Cmds; module Info
   end                                                           # }}}1
 
   # show app info
-  def self.run(cfg, *args_)
-    opts = prepare! cfg, args_; # name = cfg.name.join
+  def self.run(cfg, *args_)                                     # {{{1
+    opts = prepare! cfg, args_; name = cfg.name.join
     a = Cfg.app_to_hash cfg; t = Cfg.type_to_hash cfg
-    i = { 'app' => a, 'type' => t }
+    i = { 'name' => name, 'app' => a, 'type' => t }
     case opts[:how]
-    when :human ; puts Util.pretty_dot_hash(i)
+    when :human ; puts Util.pretty_config(i, width: opts[:width])
     when :json  ; puts JSON.pretty_generate(i)
     when :yaml  ; puts i.to_yaml
-    else        ; raise 'OOPS'
+    else        ; raise '[WTF!?] case did not match'
     end
-  end
+  end                                                           # }}}1
 
   # help message
   def self.help(cfg, *args_)
@@ -51,7 +51,7 @@ module Napp; module Cmds; module Info
   # option parser
   def self.opt_parser(opts)                                     # {{{1
     OU::Opt::Parser.new 'Options:' do |o|
-      o.on('-h', '--human', 'Human-readable') do
+      o.on('-h', '--human', 'Human-readable (the default)') do
         opts[:how] = :human
       end
       o.on('-j', '--json', 'JSON') do
@@ -59,6 +59,11 @@ module Napp; module Cmds; module Info
       end
       o.on('-y', '--yaml', 'YAML') do
         opts[:how] = :yaml
+      end
+      o.on('-w', '--width COLS', Integer,
+           'Key width; only for --human; ' +
+           "default is #{DEFAULTS[:width]}") do |x|
+        opts[:width] = x
       end
     end
   end                                                           # }}}1

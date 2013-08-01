@@ -11,6 +11,20 @@ Feature: napp help <command>
 
       """
 
+    When  I run `napp help info`
+    Then  it should succeed
+    And   the last stdout should be:
+      """
+      Usage: napp info <name> [<opt(s)>]
+
+      Options:
+          -h, --human                      Human-readable (the default)
+          -j, --json                       JSON
+          -y, --yaml                       YAML
+          -w, --width COLS                 Key width; only for --human; default is 29
+
+      """
+
   Scenario: napp help new
     When  I run `napp help new`
     Then  it should succeed
