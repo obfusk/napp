@@ -1,4 +1,5 @@
-libs  = (['lib'] + Dir['deps/*/lib']).map { |x| "-I #{x}" } *' '
+deps  = ['lib'] + Dir['deps/*/lib']
+libs  = deps.map { |x| "-I #{x}" } *' '
 spec  = '-I test/lib -r napp/spec/helper'
 cuke  = ENV['CUKE']
 
@@ -105,6 +106,26 @@ end
 desc 'Run w/ env'
 task :run do
   sh ENV['RUN']
+end
+
+desc 'Shell w/ env'
+task :sh do
+  sh 'bash'
+end
+
+desc 'Shell w/ sandbox'
+task :sandbox do
+  $:.unshift *(deps + ['test/lib']).map { |x| "#{Dir.pwd}/#{x}" }
+  puts $:
+  require 'napp/spec/sandbox'
+  s = Napp__Spec::Sandbox.new; s.setup; s.set_env
+  puts "[sandbox #{s.dir_sandbox :abs}]"
+  begin
+    sh 'bash'
+  ensure
+    s.teardown unless ENV['KEEP_SANDBOX'] == 'yes'
+    s.restore_env
+  end
 end
 
 desc 'Environment'
