@@ -46,7 +46,7 @@ Then(/^the last stderr should match:$/) do |expected|
 end
 
 Then(/^the last stdout should match upd-cmds "(.*)":$/) do |c,e|
-  cs = c.split(/\s*,\s*/).map { |x| "==> #{x}[^\\\\n]*\n.*" }
+  cs = c.split(/\s*,\s*/).map { |x| "==> #{x}[^\\\\n]*(\n.*)?" }
   e2 = e.sub /UPDATE_CMDS/, cs*"\n"
   assert_matching_output e2, last_process.stdout
 end

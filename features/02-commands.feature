@@ -91,6 +91,33 @@ Feature: napp <command> ...
       ==> Status: running \(age=\d\d:\d\d pid=\d+ daemon=\d+\)
       \Z
       """
+    When  I run `napp update <name>`
+    Then  it should succeed
+    And   the last stdout should match upd-cmds "<upd-cmds>":
+      """
+      \A==> Updating: \w+/<name>
+      ==> Waiting: <wait-stop> seconds
+      \.{<wait-stop>}
+      ==> OK
+      ==> git pull origin master
+      .*
+      UPDATE_CMDS
+      ==> ENV: PORT="<port>"
+      ==> nohup napp-daemon \S+/apps/<name>/run/daemon.stat SIG\w+ <run-cmd>[^\n]*
+      ==> Waiting: <wait-start> seconds
+      \.{<wait-start>}
+      ==> OK
+      ==> Done\.
+      \Z
+      """
+    When  I run `napp status <name>`
+    Then  it should succeed
+    And   the last stdout should match:
+      """
+      \A==> App: \w+/<name>
+      ==> Status: running \(age=\d\d:\d\d pid=\d+ daemon=\d+\)
+      \Z
+      """
     When  I run `napp stop <name>`
     Then  it should succeed
     And   the last stdout should match:
