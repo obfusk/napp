@@ -3,10 +3,11 @@ Feature: napp <command> ...
 
   Scenario Outline: napp new, bootstrap, ...
     When  I run `napp new daemon <name> ../../repos/<repo>` with:
-      | -p  | <port>    |
-      | -r  | <run>     |
-      | -u  | <update>  |
-      | -w  | <wait>    |
+      | -p  | <port>        |
+      | -r  | <run>         |
+      | -u  | <update>      |
+      | -w  | <wait-start>  |
+      | -W  | <wait-stop>   |
     Then  it should succeed
     And   the last stdout should match:
       """
@@ -20,11 +21,10 @@ Feature: napp <command> ...
       """
     When  I run `napp bootstrap <name>`
     Then  it should succeed
-    And   the last stdout should match:
+    And   the last stdout should match upd-cmds "<upd-cmds>":
       """
       \A==> Bootstrapping: \w+/<name>
-      ==> <upd-cmd>
-      .*
+      UPDATE_CMDS
       ==> Done\.
       \Z
       """
@@ -43,8 +43,8 @@ Feature: napp <command> ...
       \A==> Starting: \w+/<name>
       ==> ENV: PORT="<port>"
       ==> nohup napp-daemon \S+/apps/<name>/run/daemon.stat SIG\w+ <run-cmd>[^\n]*
-      ==> Waiting: <wait> seconds
-      \.{<wait>}
+      ==> Waiting: <wait-start> seconds
+      \.{<wait-start>}
       ==> OK
       ==> Done\.
       \Z
@@ -72,10 +72,13 @@ Feature: napp <command> ...
     And   the last stdout should match:
       """
       \A==> Restarting: \w+/<name>
+      ==> Waiting: <wait-stop> seconds
+      \.{<wait-stop>}
+      ==> OK
       ==> ENV: PORT="<port>"
       ==> nohup napp-daemon \S+/apps/<name>/run/daemon.stat SIG\w+ <run-cmd>[^\n]*
-      ==> Waiting: <wait> seconds
-      \.{<wait>}
+      ==> Waiting: <wait-start> seconds
+      \.{<wait-start>}
       ==> OK
       ==> Done\.
       \Z
@@ -93,6 +96,9 @@ Feature: napp <command> ...
     And   the last stdout should match:
       """
       \A==> Stopping: \w+/<name>
+      ==> Waiting: <wait-stop> seconds
+      \.{<wait-stop>}
+      ==> OK
       ==> Done\.
       \Z
       """
@@ -107,9 +113,10 @@ Feature: napp <command> ...
     When  I run `curl -s localhost:<port>`
     Then  it should fail
     Examples:
-      | name      | repo                  | port  | wait  | run     | update  | run-cmd             | upd-cmd         |
-      | hello-rb  | napp-hello-sinatra    | 10001 | 2     | RACKUP  | BUNDLE  | bundle exec rackup  | bundle install  |
-      | hello-clj | napp-hello-compojure  | 10002 | 2     | JAR     | UBERJAR | java -jar           | lein uberjar    |
+      | name      | repo                  | port  | wait-start  | wait-stop | run     | update    | run-cmd             | upd-cmds                  |
+      | hello-clj | napp-hello-compojure  | 10001 | 2           | 2         | JAR     | UBERJAR   | java -jar           | lein uberjar              |
+      | hello-py  | napp-hello-flask      | 10002 | 2           | 2         | VPY     | VENV_PIP  | venv python         | bash -c test -e, venv pip |
+      | hello-rb  | napp-hello-sinatra    | 10003 | 2           | 2         | RACKUP  | BUNDLE    | bundle exec rackup  | bundle install            |
 
 # TODO: kill/fail, update; 2x new
 # ...

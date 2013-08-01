@@ -1,17 +1,36 @@
-napp:
-  dirs:
+napp:                                                           # {{{1
+  dirs:                                                         # {{{2
+    # subdirectory of user(s) home directory in which apps reside
     apps: <%= dir_apps %>
+
+    # log dir (see log_sudo)
     log: <%= dir_log(:abs) %>
+
+    # nginx config dir; relative to $NAPPCFG or absolute
     nginx: nginx.d
+
+    # subdirectories of ~user/apps/$APP
     app:
       app: app
       cfg: cfg
       log: log
       run: run
+                                                                # }}}2
+
+  # main user
   user: napp
+
+  # other users
   users: []
+  # - foo
+  # - bar
+  # - baz
+
+  # use sudo w/ napp-log to append to log file
   log_w_sudo: true
-defaults:
+                                                                # }}}1
+
+defaults:                                                       # {{{1
   app:
     vcs: git
     branch: master
@@ -20,16 +39,26 @@ defaults:
       logdir: log
       public: public
   daemon:
-    wait: 7
+    wait_start: 2
+    wait_stop:  2
   nginx:
     validate_server_name: true
-    max_body_size:
-    proxy_buffering:
+    max_body_size:      # nginx default
+    proxy_buffering:    # nginx default
     ssl: false
-commands:
+                                                                # }}}1
+
+commands:                                                       # {{{1
+  # run/bootstrap/update command aliases
   aliases:
     UBERJAR:      lein uberjar
     JAR:          java -jar project.jar ${PORT}
+
+    VENV:         &venv     SHELL test -e .venv || virtualenv .venv
+    VPIP:         &vpip     venv pip install -r requirements.txt
+    VENV_PIP:     [*venv, *vpip]
+    VPY:          venv python app.py ${PORT}
+
     BUNDLE:       &bundle   bundle install
     MIGRATE:      &migrate  SHELL RAILS_ENV=production
                               bundle exec rake db:migrate
@@ -38,7 +67,12 @@ commands:
     RAILS_UPD:    [*bundle, *migrate, *assets]
     RACKUP:       SIGINT bundle exec rackup -E production -p ${PORT}
     PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
+
     CUSTOM_BOOT:  ./_scripts/bootstrap
     CUSTOM_UPD:   ./_scripts/update
+
   mongo:
   postgres:
+                                                                # }}}1
+
+# vim: set tw=70 sw=2 sts=2 et fdm=marker :

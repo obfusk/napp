@@ -52,8 +52,10 @@ Feature: napp help <command>
                                            default DIR is log
           -P, --public [DIR]               Subdir of app with public files; optional;
                                            default DIR is public
-          -w, --wait SECONDS               Wait a few seconds for the app to start;
-                                           default is 7
+          -w, --wait-start SECONDS         Wait a few seconds for the app to start;
+                                           default is 2
+          -W, --wait-stop SECONDS          Wait a few seconds for the app to stop;
+                                           default is 2
               --server NAME                Nginx server_name; optional
               --[no-]validate-server       Validate server_name as ^[a-z0-9.*-]+|_$;
                                            default is true

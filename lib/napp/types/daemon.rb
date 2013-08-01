@@ -2,7 +2,7 @@
 #
 # File        : napp/types/daemon.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-31
+# Date        : 2013-08-01
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -18,7 +18,8 @@ module Napp; module Types; module Daemon
 
   DEFAULTS = {
     type: 'daemon', listen: nil, port: false, run: nil, bootstrap: [],
-    update: [], logdir: false, public: false, wait: nil, nginx: false
+    update: [], logdir: false, public: false, wait_start: nil,
+    wait_stop: nil, nginx: false
   }
 
   TypeCfg = OU.struct(*DEFAULTS.keys) do                        # {{{1
@@ -39,7 +40,8 @@ module Napp; module Types; module Daemon
 
   # extends Cmd::New option parser; MODIFIES cfg
   def self.options(o, cfg, type)                                # {{{1
-    d = cfg.global.defaults['types']['daemon']
+    d   = cfg.global.defaults['types']['daemon']
+    dd  = cfg.global.defaults['daemon']
     o.on('-s', '--socket', 'Listen on socket') do |x|
       type.listen = :socket
     end
@@ -67,10 +69,15 @@ module Napp; module Types; module Daemon
          "default DIR is #{d['public']}") do |x|
       type.public = x || d['public']
     end
-    o.on('-w', '--wait SECONDS', Integer,
+    o.on('-w', '--wait-start SECONDS', Integer,
          'Wait a few seconds for the app to start;',
-         "default is #{cfg.global.defaults['daemon']['wait']}") do |x|
-      type.wait = x
+         "default is #{dd['wait_start']}") do |x|
+      type.wait_start = x
+    end
+    o.on('-W', '--wait-stop SECONDS', Integer,
+         'Wait a few seconds for the app to stop;',
+         "default is #{dd['wait_stop']}") do |x|
+      type.wait_stop = x
     end
     type.nginx = Nginx::NginxCfg.new if type  # temporary
     Nginx.options o, cfg, (type && type.nginx)
@@ -80,14 +87,16 @@ module Napp; module Types; module Daemon
   def self.prepare!(cfg, type)                                  # {{{1
     # NB: nothing to validate for commands except presence
     type.bootstrap = type.update.dup if type.bootstrap.empty?
-    type.wait ||= cfg.global.defaults['daemon']['wait']
+    type.wait_start ||= cfg.global.defaults['daemon']['wait_start']
+    type.wait_stop  ||= cfg.global.defaults['daemon']['wait_stop']
     OU::Valid.invalid! 'no socket or port' unless type.listen
     OU::Valid.invalid! 'no run command' unless type.run
     OU::Valid.invalid! 'no update command(s)' if type.update.empty?
     Valid.port! type.port if type.listen == :port
     Valid.path! 'logdir', type.logdir if type.logdir
     Valid.path! 'public', type.public if type.public
-    Valid.seconds! type.wait
+    Valid.seconds! type.wait_start
+    Valid.seconds! type.wait_stop
     type.nginx = Nginx.prepare!(cfg, type.nginx)
     type.nginx.freeze if type.nginx   # done.
     # TODO: build/check! nginx ?!
@@ -129,17 +138,17 @@ module Napp; module Types; module Daemon
     port = cfg.type.listen == :port ? cfg.type.port.to_s : nil
     vars = { 'SOCKET' => sock, 'PORT' => port }
     Util.rm_if_exists sock if sock
-    D.start cfg, vars: vars, env: vars, n: cfg.type.wait
+    D.start cfg, vars: vars, env: vars, n: cfg.type.wait_start
   end
 
   # stop app
   def self.stop(cfg)
-    D.stop cfg
+    D.stop cfg, n: cfg.type.wait_stop
   end
 
   # restart app
   def self.restart(cfg)
-    stop cfg; sleep 1; start cfg                                # TODO
+    stop cfg; start cfg
   end
 
 end; end; end

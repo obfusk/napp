@@ -2,7 +2,7 @@
 #
 # File        : napp/daemon.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-29
+# Date        : 2013-08-01
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -46,7 +46,7 @@ module Napp; module Daemon
 
   # start process w/ napp-daemon (if not running), wait a few seconds
   def self.start(cfg, opts = {})                                # {{{1
-    nohup = opts.fetch :nohup, true ; n   = opts[:n] || 7
+    nohup = opts.fetch :nohup, true ; n   = opts[:n] || 5
     vars  = opts[:vars] || {}       ; env = opts[:env] || {}
     sta   = stat cfg, :ok
     if sta[:alive]
@@ -63,17 +63,18 @@ module Napp; module Daemon
       OU.onow 'ENV', *OU::Cmd.env_to_a(env) if !env.empty?
       OU.ospawn(*cmd, chdir: dir, env: env,
         out: [olog, 'a'], err: [elog, 'a'], in: '/dev/null')
-      wait! cfg, n
+      wait! cfg, :running, n
     end
   end                                                           # }}}1
 
   # stop napp-daemon
-  def self.stop(cfg)                                            # {{{1
-    sta = stat cfg, :ok
+  def self.stop(cfg, opts = {})                                 # {{{1
+    n = opts[:n] || 5; sta = stat cfg, :ok
     if !sta[:alive]
       OU.opoo "process is not running (status=#{sta[:status]})"
     else
       ::Process.kill 'SIGTERM', sta[:daemon_pid]
+      wait! cfg, :terminated, n
     end
   end                                                           # }}}1
 
@@ -121,18 +122,18 @@ module Napp; module Daemon
     sh ? [sh, '-c', c2] : c2.split
   end
 
-  # wait n secs; show message, dots, OK; die if process isn't running
-  def self.wait!(cfg, n)                                        # {{{1
+  # wait n secs; show message, dots, OK; die if process isn't what
+  def self.wait!(cfg, what, n)                                  # {{{1
     if n > 0
       OU.onow 'Waiting', "#{n} seconds"
       n.times { sleep 1; print '.'; $stdout.flush }
       puts
     end
     s = stat(cfg, :die)[:status]
-    if s == :running
+    if s == what
       OU.onow 'OK'
     else
-      OU.odie! "process is not running (status=#{s})", log: cfg.logger
+      OU.odie! "process is not #{what} (status=#{s})", log: cfg.logger
     end
   end                                                           # }}}1
 

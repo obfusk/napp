@@ -4,7 +4,7 @@
 #
 # File        : napp-deamon
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-31
+# Date        : 2013-08-01
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -39,7 +39,8 @@ statfile="$1" signal="$2" pid= ret= stopped=n; shift 2
 
 # --
 
-function bye () { kill -"$signal" "$pid" || true; stopped=y; exit; }
+function bye ()
+{ kill -"$signal" "$pid" || true; stopped=y; wait; exit; }
 
 function handle_TERM ()
 { echo 'terminated SIGTERM' > "$statfile"; bye; }

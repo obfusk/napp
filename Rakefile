@@ -116,12 +116,12 @@ end
 desc 'Shell w/ sandbox'
 task :sandbox do
   $:.unshift *(deps + ['test/lib']).map { |x| "#{Dir.pwd}/#{x}" }
-  puts $:
   require 'napp/spec/sandbox'
   s = Napp__Spec::Sandbox.new; s.setup; s.set_env
   puts "[sandbox #{s.dir_sandbox :abs}]"
   begin
-    sh 'bash'
+    rc = 'cat ~/.bashrc; echo \'PS1="[SANDBOX]$PS1"\''
+    sh 'bash', '-c', "bash --rcfile <( #{rc} )"
   ensure
     s.teardown unless ENV['KEEP_SANDBOX'] == 'yes'
     s.restore_env

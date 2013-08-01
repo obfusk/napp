@@ -39,7 +39,8 @@ defaults:                                                       # {{{1
       logdir: log
       public: public
   daemon:
-    wait: 7
+    wait_start: 2
+    wait_stop:  2
   nginx:
     validate_server_name: true
     max_body_size:      # nginx default
@@ -53,14 +54,17 @@ commands:                                                       # {{{1
     UBERJAR:      lein uberjar
     JAR:          java -jar project.jar ${PORT}
 
+    VENV:         &venv     SHELL test -e .venv || virtualenv .venv
+    VPIP:         &vpip     venv pip install -r requirements.txt
+    VENV_PIP:     [*venv, *vpip]
+    VPY:          venv python app.py ${PORT}
+
     BUNDLE:       &bundle   bundle install
     MIGRATE:      &migrate  SHELL RAILS_ENV=production
                               bundle exec rake db:migrate
     ASSETS:       &assets   SHELL RAILS_ENV=production
                               bundle exec rake assets:precompile
-
     RAILS_UPD:    [*bundle, *migrate, *assets]
-
     RACKUP:       SIGINT bundle exec rackup -E production -p ${PORT}
     PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
 

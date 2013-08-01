@@ -9,5 +9,6 @@ update:
 - BUNDLE
 logdir: false
 public: false
-wait: 7
+wait_start: 2
+wait_stop: 2
 nginx: false
