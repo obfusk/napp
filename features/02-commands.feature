@@ -114,9 +114,9 @@ Feature: napp <command> ...
     Then  it should fail
     Examples:
       | name      | repo                  | port  | wait-start  | wait-stop | run     | update    | run-cmd             | upd-cmds                  |
-      | hello-clj | napp-hello-compojure  | 10001 | 2           | 2         | JAR     | UBERJAR   | java -jar           | lein uberjar              |
-      | hello-py  | napp-hello-flask      | 10002 | 2           | 2         | VPY     | VENV_PIP  | venv python         | bash -c test -e, venv pip |
-      | hello-rb  | napp-hello-sinatra    | 10003 | 2           | 2         | RACKUP  | BUNDLE    | bundle exec rackup  | bundle install            |
+      | hello-clj | napp-hello-compojure  | 10001 | 1           | 1         | JAR     | UBERJAR   | java -jar           | lein uberjar              |
+      | hello-py  | napp-hello-flask      | 10002 | 1           | 1         | VPY     | VENV_PIP  | venv python         | bash -c test -e, venv pip |
+      | hello-rb  | napp-hello-sinatra    | 10003 | 1           | 1         | RACKUP  | BUNDLE    | bundle exec rackup  | bundle install            |
 
 # TODO: kill/fail, update; 2x new
 # ...
