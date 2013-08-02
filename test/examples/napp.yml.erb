@@ -55,8 +55,10 @@ commands:                                                       # {{{1
     JAR:          java -jar project.jar ${PORT}
 
     NPM:          npm install
-    COFFEE:       coffee app.coffee -- ${PORT}
-    NODE:         node app.js ${PORT}
+    COFFEE:       SHELL NODE_ENV=production
+                    coffee app.coffee -- ${PORT}
+    NODE:         SHELL NODE_ENV=production
+                    node app.js ${PORT}
 
     VENV:         &venv     SHELL test -e .venv || virtualenv .venv
     VPIP:         &vpip     venv pip install -r requirements.txt
