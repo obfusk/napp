@@ -72,6 +72,7 @@ commands:                                                       # {{{1
                               bundle exec rake assets:precompile
     RAILS_UPD:    [*bundle, *migrate, *assets]
     RACKUP:       SIGINT bundle exec rackup -E production -p ${PORT}
+    RAILS:        SIGINT bundle exec rails s -e production -p ${PORT}
     PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
 
     CUSTOM_BOOT:  ./_scripts/bootstrap

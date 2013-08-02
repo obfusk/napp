@@ -134,3 +134,11 @@ task :env do
   puts "export NAPPCFG='#{ENV['NAPPCFG']}'"
   puts "export RUBYOPT='#{ENV['RUBYOPT']}'"
 end
+
+desc 'Update text/examples/'
+task :ex do
+  a = 'examples/napp.yml'; b = 'test/examples/napp.yml.erb'
+  sh "cp #{a} #{b}"
+  sh "sed -i 's!apps: apps!apps: <%= dir_apps %>!' #{b}"
+  sh "sed -i 's!log: /var/log/napp!log: <%= dir_log(:abs) %>!' #{b}"
+end

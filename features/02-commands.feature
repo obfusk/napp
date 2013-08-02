@@ -162,11 +162,12 @@ Feature: napp <command> ...
       \Z
       """
     Examples:
-      | name      | repo                  | port  | wait-start  | wait-stop | run     | update    | run-cmd                             | upd-cmds                  |
-      | hello-clj | napp-hello-compojure  | 10001 | 2           | 1         | JAR     | UBERJAR   | java -jar                           | lein uberjar              |
-      | hello-js  | napp-hello-express    | 10002 | 1           | 1         | COFFEE  | NPM       | bash -c NODE_ENV=production coffee  | npm install               |
-      | hello-py  | napp-hello-flask      | 10003 | 1           | 1         | VPY     | VENV_PIP  | venv python                         | bash -c test -e, venv pip |
-      | hello-rb  | napp-hello-sinatra    | 10004 | 1           | 1         | RACKUP  | BUNDLE    | bundle exec rackup                  | bundle install            |
+      | name      | repo                  | port  | wait-start  | wait-stop | run     | update    | run-cmd                             | upd-cmds                                                                                                                                  |
+      | hello-clj | napp-hello-compojure  | 10001 | 2           | 1         | JAR     | UBERJAR   | java -jar                           | lein uberjar                                                                                                                              |
+      | hello-js  | napp-hello-express    | 10002 | 1           | 1         | COFFEE  | NPM       | bash -c NODE_ENV=production coffee  | npm install                                                                                                                               |
+      | hello-py  | napp-hello-flask      | 10003 | 1           | 1         | VPY     | VENV_PIP  | venv python                         | bash -c test -e .venv, venv pip install                                                                                                   |
+      | hello-rb  | napp-hello-sinatra    | 10004 | 1           | 1         | RACKUP  | BUNDLE    | bundle exec rackup                  | bundle install                                                                                                                            |
+      | hello-ror | napp-hello-rails      | 10005 | 3           | 1         | RAILS   | RAILS_UPD | bundle exec rails                   | bundle install, bash -c RAILS_ENV=production bundle exec rake db:migrate, bash -c RAILS_ENV=production bundle exec rake assets:precompile |
 
 # TODO: kill/fail, update; 2x new
 # ...
