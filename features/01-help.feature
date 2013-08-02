@@ -95,6 +95,16 @@ Feature: napp help <command>
 
       """
 
+  Scenario: napp help run
+
+    When  I run `napp help run`
+    Then  it should succeed
+    And   the last stdout should be:
+      """
+      Usage: napp run <name> <cmd> [<arg(s)>]
+
+      """
+
   Scenario: napp help start
 
     When  I run `napp help start`

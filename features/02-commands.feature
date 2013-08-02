@@ -161,6 +161,28 @@ Feature: napp <command> ...
       type\.nginx                    : false
       \Z
       """
+    When  I run `napp run <name> echo OK`
+    Then  it should succeed
+    And   the last stdout should match:
+      """
+      \A==> App: \w+/<name>
+      ==> echo OK
+      OK
+      ==> Done\.
+      \Z
+      """
+    When  I run `napp run <name> TEST`
+    Then  it should succeed
+    And   the last stdout should match:
+      """
+      \A==> App: \w+/<name>
+      ==> echo OK
+      OK
+      ==> pwd
+      \S+sandbox\S+/apps/<name>/app
+      ==> Done\.
+      \Z
+      """
     Examples:
       | name      | repo                  | port  | wait-start  | wait-stop | run     | update    | run-cmd                             | upd-cmds                                                                                                                                  |
       | hello-clj | napp-hello-compojure  | 10001 | 2           | 1         | JAR     | UBERJAR   | java -jar                           | lein uberjar                                                                                                                              |

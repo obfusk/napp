@@ -2,7 +2,7 @@
 #
 # File        : napp/daemon.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-08-01
+# Date        : 2013-08-02
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -100,6 +100,11 @@ module Napp; module Daemon
     cfg.global.commands['aliases'][cmd] || cmd
   end
 
+  # is alias?
+  def self.alias?(cfg, cmd)
+    cfg.global.commands['aliases'].has_key? cmd
+  end
+
   # napp-daemon command
   def self.daemon_cmd(cfg, cmd, vars, nohup = true)
     c1 = sh_var_sig_cmd cmd, vars
@@ -116,9 +121,9 @@ module Napp; module Daemon
   end
 
   # process shell, set vars; returns [command, ...]
-  def self.sh_var_cmd(cmd, vars)
+  def self.sh_var_cmd(cmd, vars = nil)
     c1 = OU::Cmd.shell cmd; sh = c1[:shell]
-    c2 = OU::Cmd.set_vars c1[:command], vars
+    c2 = vars ? OU::Cmd.set_vars(c1[:command], vars) : c1[:command]
     sh ? [sh, '-c', c2] : c2.split
   end
 

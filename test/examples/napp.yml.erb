@@ -78,6 +78,12 @@ commands:                                                       # {{{1
     CUSTOM_BOOT:  ./_scripts/bootstrap
     CUSTOM_UPD:   ./_scripts/update
 
+    RAILS_C:      SHELL RAILS_ENV=production bundle exec rails c
+
+    TEST:
+      - echo OK
+      - pwd
+
   mongo:
   postgres:
                                                                 # }}}1

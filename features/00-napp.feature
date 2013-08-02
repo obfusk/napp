@@ -49,7 +49,7 @@ Feature: SANDBOX, NAPPCFG, napp, version, help
       """
       Usage: napp { <command> [<arg(s)>] | help [<command>] | version }
 
-      Commands: bootstrap, info, new, restart, start, status, stop, update
+      Commands: bootstrap, info, new, restart, run, start, status, stop, update
 
       """
 
