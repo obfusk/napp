@@ -54,6 +54,10 @@ commands:                                                       # {{{1
     UBERJAR:      lein uberjar
     JAR:          java -jar project.jar ${PORT}
 
+    NPM:          npm install
+    COFFEE:       coffee app.coffee -- ${PORT}
+    NODE:         node app.js ${PORT}
+
     VENV:         &venv     SHELL test -e .venv || virtualenv .venv
     VPIP:         &vpip     venv pip install -r requirements.txt
     VENV_PIP:     [*venv, *vpip]
