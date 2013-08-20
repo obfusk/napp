@@ -51,13 +51,15 @@ defaults:                                                       # {{{1
 commands:                                                       # {{{1
   # run/bootstrap/update command aliases
   aliases:
-    UBERJAR:      lein uberjar
+    LEIN_UJ:      lein uberjar
     JAR:          java -jar project.jar ${PORT}
 
+    MNV:          mvn clean package
+
     NPM:          npm install
-    COFFEE:       SHELL NODE_ENV=production
+    COFFEE:       env NODE_ENV=production
                     coffee app.coffee -- ${PORT}
-    NODE:         SHELL NODE_ENV=production
+    NODE:         env NODE_ENV=production
                     node app.js ${PORT}
 
     VENV:         &venv     SHELL test -e .venv || virtualenv .venv
@@ -66,19 +68,22 @@ commands:                                                       # {{{1
     VPY:          venv python app.py ${PORT}
 
     BUNDLE:       &bundle   bundle install
-    MIGRATE:      &migrate  SHELL RAILS_ENV=production
+    MIGRATE:      &migrate  env RAILS_ENV=production
                               bundle exec rake db:migrate
-    ASSETS:       &assets   SHELL RAILS_ENV=production
+    ASSETS:       &assets   env RAILS_ENV=production
                               bundle exec rake assets:precompile
     RAILS_UPD:    [*bundle, *migrate, *assets]
     RACKUP:       SIGINT bundle exec rackup -E production -p ${PORT}
     RAILS:        SIGINT bundle exec rails s -e production -p ${PORT}
     PUMA_SOCK:    bundle exec puma -e production -b unix://${SOCKET}
 
+    BASH:         bash app.bash ${PORT}
+    NONE:         'true'
+
     CUSTOM_BOOT:  ./_scripts/bootstrap
     CUSTOM_UPD:   ./_scripts/update
 
-    RAILS_C:      SHELL RAILS_ENV=production bundle exec rails c
+    RAILS_C:      env RAILS_ENV=production bundle exec rails c
 
     TEST:
       - echo OK
