@@ -2,7 +2,7 @@
 #
 # File        : features/support/env.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-07-31
+# Date        : 2013-09-10
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2
@@ -14,30 +14,13 @@ $:.unshift File.expand_path('../../../test/lib', __FILE__)
 require 'napp/spec/helper'
 require 'napp/spec/sandbox'
 
-require 'aruba/cucumber'
+require 'aruba/obfusk'
 
 # --
 
-module ArubaExtensions
-  def last_process
-    processes.last[-1]
-  end
+Before do
+  process_VERBOSE
 end
-
-World(ArubaExtensions)
-
-# --
-
-Before do                                                       # {{{1
-  @verbose = ENV['VERBOSE'] == 'yes'
-  if @verbose
-    @announce_stdout  = true
-    @announce_stderr  = true
-    @announce_cmd     = true
-    @announce_dir     = true
-    @announce_env     = true
-  end
-end                                                             # }}}1
 
 Before('@slow') do
   @aruba_timeout_seconds = 60
